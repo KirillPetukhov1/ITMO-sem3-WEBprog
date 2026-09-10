@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Управление студентами</title>
+    <link rel="icon" href="funny_cat.jpg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <h1>Система учета студентов</h1>
+            <button class="button primary" id="add-button" type="button">Добавить студента</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="page active" id="list-page">
+            <h2>Список студентов</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ФИО</th>
+                            <th>Группа</th>
+                            <th>ИСУ ID</th>
+                            <th>Общежитие</th>
+                            <th>Комната</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table"></tbody>
+                </table>
+            </div>
+
+            <p class="empty-message" id="empty-message">Список студентов пуст.</p>
+        </section>
+
+        <section class="page" id="form-page">
+            <h2 id="form-title">Добавление студента</h2>
+
+            <form id="student-form">
+                <input type="hidden" id="student-id">
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="full-name">ФИО студента</label>
+                        <input id="full-name" type="text" required minlength="5" maxlength="100" placeholder="Иванов Иван Иванович">
+                        <span class="error" id="full-name-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="group">Группа</label>
+                        <input id="group" type="text" required pattern="[A-Z][0-9]{4}" maxlength="5"
+                            placeholder="P3215">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="isu-id">ИСУ ID</label>
+                        <input id="isu-id" type="text" required pattern="[0-9]{6}" maxlength="6" inputmode="numeric"
+                            placeholder="123456">
+                        <span class="error" id="isu-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dormitory">Номер общежития</label>
+                        <input id="dormitory" type="number" required min="1" max="99">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="room">Комната</label>
+                        <input id="room" type="number" required min="1" max="9999">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settlement-date">Срок заселения</label>
+                        <input id="settlement-date" type="date" required>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input id="is-foreigner" type="checkbox">
+                            Иностранный студент
+                        </label>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="notes">Заметки</label>
+                        <textarea id="notes" rows="4" maxlength="500"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="button primary" type="submit">Сохранить</button>
+                    <button class="button secondary" id="cancel-button" type="button">Отмена</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="page" id="details-page">
+            <h2>Досье студента</h2>
+            <div class="details" id="student-details"></div>
+
+            <div class="form-actions">
+                <button class="button primary" id="edit-details-button" type="button">Редактировать</button>
+                <button class="button secondary" id="back-button" type="button">Назад</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="app.js" defer></script>
+</body>
+
+</html>
