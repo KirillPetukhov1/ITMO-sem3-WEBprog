@@ -1,12 +1,14 @@
 "use strict";
 
-const businessScript = document.createElement("script");
-businessScript.src = "business.js";
-businessScript.onload = startApplication;
-document.head.append(businessScript);
+import { load, save, findById, add, update, remove, validate } from './business'
 
-function startApplication() {
-    let students = StudentService.load();
+// const businessScript = document.createElement("script");
+// businessScript.src = "business.js";
+// businessScript.onload = startApplication;
+// document.head.append(businessScript);
+
+// function startApplication() {
+    let students = load();
     let selectedStudentId = null;
 
     const listPage = document.querySelector("#list-page");
@@ -120,7 +122,7 @@ function startApplication() {
     }
 
     function saveAndRender() {
-        StudentService.save(students);
+        save(students);
         renderStudents();
         showPage(listPage);
     }
@@ -130,7 +132,7 @@ function startApplication() {
     document.querySelector("#back-button").addEventListener("click", () => showPage(listPage));
 
     document.querySelector("#edit-details-button").addEventListener("click", () => {
-        const student = StudentService.findById(students, selectedStudentId);
+        const student = findById(students, selectedStudentId);
         if (student) openForm(student);
     });
 
@@ -139,13 +141,13 @@ function startApplication() {
         if (!button) return;
 
         const id = Number(button.dataset.id);
-        const student = StudentService.findById(students, id);
+        const student = findById(students, id);
         if (!student) return;
 
         if (button.dataset.action === "details") showDetails(student);
         if (button.dataset.action === "edit") openForm(student);
         if (button.dataset.action === "delete" && confirm("Удалить студента?")) {
-            students = StudentService.remove(students, id);
+            students = remove(students, id);
             saveAndRender();
         }
     });
@@ -161,17 +163,17 @@ function startApplication() {
         const idValue = document.querySelector("#student-id").value;
         const currentId = idValue ? Number(idValue) : null;
         const studentData = readForm();
-        const error = StudentService.validate(studentData, students, currentId);
+        const error = validate(studentData, students, currentId);
 
         showValidationError(error);
         if (error) return;
 
         students = currentId
-            ? StudentService.update(students, currentId, studentData)
-            : StudentService.add(students, studentData);
+            ? update(students, currentId, studentData)
+            : add(students, studentData);
 
         saveAndRender();
     });
 
     renderStudents();
-}
+// }

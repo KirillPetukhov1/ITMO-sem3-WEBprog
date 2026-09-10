@@ -1,6 +1,6 @@
 "use strict";
 
-const StudentService = (() => {
+// const StudentService = (() => {
     const STORAGE_KEY = "students_simple_v1";
 
     const defaultStudents = [
@@ -74,5 +74,5 @@ const StudentService = (() => {
         return null;
     }
 
-    return { load, save, findById, add, update, remove, validate };
-})();
+//     return { load, save, findById, add, update, remove, validate };
+// })();
