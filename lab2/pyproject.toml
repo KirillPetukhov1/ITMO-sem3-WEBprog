@@ -1,0 +1,13 @@
+[project]
+name = "student-management-lab2"
+version = "0.1.0"
+description = "Учет студентов общежития: Django REST Framework и JSON"
+requires-python = ">=3.12"
+dependencies = [
+    "django>=5.2,<5.3",
+    "djangorestframework>=3.16,<3.17",
+    "filelock>=3.18,<4",
+]
+
+[tool.uv]
+package = false

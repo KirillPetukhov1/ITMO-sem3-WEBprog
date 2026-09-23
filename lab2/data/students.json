@@ -1,0 +1,202 @@
+[
+  {
+    "fullName": "Иванов Иван Иванович",
+    "group": "P3215",
+    "isuId": "100001",
+    "dormitory": 8,
+    "room": 101,
+    "settlementDate": "2026-09-01",
+    "isForeigner": false,
+    "notes": "Староста этажа"
+  },
+  {
+    "fullName": "Петров Петр Сергеевич",
+    "group": "P3215",
+    "isuId": "100002",
+    "dormitory": 8,
+    "room": 102,
+    "settlementDate": "2026-09-01",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Сидорова Анна Олеговна",
+    "group": "P3216",
+    "isuId": "100003",
+    "dormitory": 8,
+    "room": 103,
+    "settlementDate": "2026-09-02",
+    "isForeigner": false,
+    "notes": "Нужна верхняя полка"
+  },
+  {
+    "fullName": "Смирнов Алексей Андреевич",
+    "group": "M3302",
+    "isuId": "100004",
+    "dormitory": 7,
+    "room": 201,
+    "settlementDate": "2026-08-29",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Кузнецова Мария Игоревна",
+    "group": "M3301",
+    "isuId": "100005",
+    "dormitory": 7,
+    "room": 202,
+    "settlementDate": "2026-08-29",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Попов Дмитрий Павлович",
+    "group": "M3302",
+    "isuId": "100006",
+    "dormitory": 7,
+    "room": 203,
+    "settlementDate": "2026-08-30",
+    "isForeigner": false,
+    "notes": "Позднее заселение"
+  },
+  {
+    "fullName": "Васильева Елена Романовна",
+    "group": "N3345",
+    "isuId": "100007",
+    "dormitory": 10,
+    "room": 301,
+    "settlementDate": "2026-09-03",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Соколов Артем Максимович",
+    "group": "N3345",
+    "isuId": "100008",
+    "dormitory": 10,
+    "room": 302,
+    "settlementDate": "2026-09-03",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Михайлова Софья Денисовна",
+    "group": "N3346",
+    "isuId": "100009",
+    "dormitory": 10,
+    "room": 303,
+    "settlementDate": "2026-09-04",
+    "isForeigner": false,
+    "notes": "Аллергия на животных"
+  },
+  {
+    "fullName": "Новиков Максим Евгеньевич",
+    "group": "R3120",
+    "isuId": "100010",
+    "dormitory": 8,
+    "room": 204,
+    "settlementDate": "2026-09-05",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Федорова Полина Артемовна",
+    "group": "R3120",
+    "isuId": "100011",
+    "dormitory": 8,
+    "room": 205,
+    "settlementDate": "2026-09-05",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Морозов Никита Олегович",
+    "group": "R3121",
+    "isuId": "100012",
+    "dormitory": 8,
+    "room": 206,
+    "settlementDate": "2026-09-06",
+    "isForeigner": false,
+    "notes": "Заселение после 18:00"
+  },
+  {
+    "fullName": "Волкова Дарья Алексеевна",
+    "group": "T3105",
+    "isuId": "100013",
+    "dormitory": 9,
+    "room": 401,
+    "settlementDate": "2026-09-07",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Алексеев Кирилл Викторович",
+    "group": "T3105",
+    "isuId": "100014",
+    "dormitory": 9,
+    "room": 402,
+    "settlementDate": "2026-09-07",
+    "isForeigner": false,
+    "notes": ""
+  },
+  {
+    "fullName": "Лебедева Екатерина Ильинична",
+    "group": "T3106",
+    "isuId": "100015",
+    "dormitory": 9,
+    "room": 403,
+    "settlementDate": "2026-09-08",
+    "isForeigner": false,
+    "notes": "Требуется место у окна"
+  },
+  {
+    "fullName": "Чжан Вэй",
+    "group": "P3216",
+    "isuId": "100016",
+    "dormitory": 8,
+    "room": 104,
+    "settlementDate": "2026-09-02",
+    "isForeigner": true,
+    "notes": "Обучение по обмену"
+  },
+  {
+    "fullName": "Ахмед Хасан Али",
+    "group": "M3302",
+    "isuId": "100017",
+    "dormitory": 7,
+    "room": 204,
+    "settlementDate": "2026-08-30",
+    "isForeigner": true,
+    "notes": ""
+  },
+  {
+    "fullName": "Ким Мин Джун",
+    "group": "N3346",
+    "isuId": "100018",
+    "dormitory": 10,
+    "room": 304,
+    "settlementDate": "2026-09-04",
+    "isForeigner": true,
+    "notes": "Обучение по обмену"
+  },
+  {
+    "fullName": "Гарсия Луис Мигель",
+    "group": "R3121",
+    "isuId": "100019",
+    "dormitory": 8,
+    "room": 207,
+    "settlementDate": "2026-09-06",
+    "isForeigner": true,
+    "notes": ""
+  },
+  {
+    "fullName": "Смит Эмили Джейн",
+    "group": "T3107",
+    "isuId": "100020",
+    "dormitory": 9,
+    "room": 404,
+    "settlementDate": "2026-09-08",
+    "isForeigner": true,
+    "notes": "Обучение по обмену"
+  }
+]
