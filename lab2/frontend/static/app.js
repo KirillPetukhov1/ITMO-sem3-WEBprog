@@ -47,7 +47,6 @@ function errorMessage(error) {
 }
 
 async function loadStudents() {
-    // Более старый ответ не должен перерисовать результат новых фильтров.
     const requestId = ++listRequestId;
     renderListMessage("Загрузка...");
     renderPagination();
@@ -59,7 +58,6 @@ async function loadStudents() {
         } catch (error) {
             if (requestId !== listRequestId) return;
             if (error.code !== "PAGE_NOT_FOUND") throw error;
-            // Последняя страница могла исчезнуть после удаления студента.
             currentPage = Number(error.details.total_pages) || 1;
             data = await getStudents({ ...activeFilters, page: currentPage, page_size: pageSize });
         }
