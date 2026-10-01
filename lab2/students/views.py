@@ -42,14 +42,6 @@ class StudentListView(APIView):
         page_of_students = list_students(params)
         return Response(page_of_students)
 
-    def query(self, request):
-        serializer = ListQuerySerializer(data=request.data)
-        if not serializer.is_valid():
-            raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
-        params = serializer.validated_data
-        page_of_students = list_students(params)
-        return Response(page_of_students)
-
     def post(self, request: Request) -> Response:
         """Создать студента из данных запроса.
 
