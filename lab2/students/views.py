@@ -12,7 +12,7 @@ from .services import (
 
 
 class StudentListView(APIView):
-    http_method_names = ["get", "post", "head", "options"]
+    http_method_names = ["get", "query", "post", "head", "options"]
 
     def get(self, request: Request) -> Response:
         """Вернуть отфильтрованный список студентов.
@@ -28,6 +28,19 @@ class StudentListView(APIView):
         if not serializer.is_valid():
             raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
         return Response(list_students(serializer.validated_data))
+    
+    def query(self, request: Request) -> Response:
+        """Обработать QUERY-запрос так же, как GET.
+
+        Args:
+            request: Исходный HTTP-запрос.
+        """
+        serializer = ListQuerySerializer(data=request.data)
+        if not serializer.is_valid():
+            raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
+        params = serializer.validated_data
+        page_of_students = list_students(params)
+        return Response(page_of_students)
 
     def post(self, request: Request) -> Response:
         """Создать студента из данных запроса.
@@ -44,7 +57,7 @@ class StudentListView(APIView):
 
 
 class StudentDetailView(APIView):
-    http_method_names = ["get", "query", "patch", "delete", "head", "options"]
+    http_method_names = ["get", "patch", "delete", "head", "options"]
 
     def get(self, request: Request, isu_id: str) -> Response:
         """Вернуть студента по ИСУ ID.
@@ -55,15 +68,6 @@ class StudentDetailView(APIView):
         """
         validate_isu_id(isu_id)
         return Response(get_student(isu_id))
-
-    def query(self, request: Request, isu_id: str) -> Response:
-        """Обработать QUERY-запрос так же, как GET.
-
-        Args:
-            request: Исходный HTTP-запрос.
-            isu_id: Идентификатор студента.
-        """
-        return self.get(request, isu_id)
 
     def patch(self, request: Request, isu_id: str) -> Response:
         """Частично обновить данные студента.
