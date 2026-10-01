@@ -47,8 +47,7 @@ class StudentListView(APIView):
         if not serializer.is_valid():
             raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
         params = serializer.validated_data
-        service = get_service()
-        page_of_students = service.list(params)
+        page_of_students = list_students(params)
         return Response(page_of_students)
 
     def post(self, request: Request) -> Response:
