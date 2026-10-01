@@ -73,7 +73,17 @@ export async function getStudents(filters = {}) {
     });
 
     const query = params.toString();
-    const data = await request(query ? `?${query}` : "");
+    
+    let data;
+    if(params.size > 5){ // page и page_size тоже идут за фильтры
+        data = await request("", {
+            method: "QUERY",
+            body: JSON.stringify(Object.fromEntries(params))
+        })
+    }else{
+        data = await request(query ? `?${query}` : "")
+    }
+    
 
     if (!data || !Array.isArray(data.results) || !Number.isInteger(data.page)) {
         throw new ApiError(200, "INVALID_RESPONSE", "Некорректный формат страницы студентов.");

@@ -70,7 +70,6 @@ export function clearFormErrors() {
 
 export function showFormErrors(details = {}, message = "Проверьте введенные данные.") {
     clearFormErrors();
-    let hasFieldErrors = false;
 
     Object.entries(details).forEach(([field, value]) => {
         const inputId = fieldIds[field];
@@ -84,13 +83,10 @@ export function showFormErrors(details = {}, message = "Проверьте вв�
         const errorMessage = Array.isArray(value) ? value.join(" ") : String(value);
         errorElement.textContent = errorMessage;
         document.querySelector(`#${inputId}`).setAttribute("aria-invalid", "true");
-        hasFieldErrors = true;
     });
 
-    if (!hasFieldErrors || message) {
-        formError.textContent = message;
-        formError.hidden = false;
-    }
+    formError.textContent = message;
+    formError.hidden = !message;
 }
 
 export function openStudentForm(student = null) {

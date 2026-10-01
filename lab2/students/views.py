@@ -1,10 +1,12 @@
 import re
 from django.conf import settings
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from .constants import ISU_PATTERN
+from .error_handlers import error_body
 from .exceptions import ApplicationError
 from .repository import JsonStudentRepository
 from .serializers import ListQuerySerializer, StudentSerializer
@@ -31,7 +33,7 @@ def parse_student(data, partial=False):
 
 
 class StudentListView(APIView):
-    http_method_names = ["get", "post", "head", "options"]
+    http_method_names = ["get", "query", "post", "head", "options"]
 
     def get(self, request):
         repeated = {k: ["Параметр должен быть указан один раз."] for k in request.query_params
@@ -47,6 +49,14 @@ class StudentListView(APIView):
         student = get_service().create(parse_student(request.data))
         location = reverse("student-detail", kwargs={"isu_id": student["isuId"]}, request=request)
         return Response(student, status=status.HTTP_201_CREATED, headers={"Location": location})
+    def query(self, request):
+        serializer = ListQuerySerializer(data=request.data)
+        if not serializer.is_valid():
+            raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
+        params = serializer.validated_data
+        service = get_service()
+        page_of_students = service.list(params)
+        return Response(page_of_students)
 
 
 class StudentDetailView(APIView):
@@ -67,8 +77,5 @@ class StudentDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UnknownApiView(APIView):
-    def dispatch(self, request, *args, **kwargs):
-        from django.http import JsonResponse
-        from .error_handlers import error_body
-        return JsonResponse(error_body("NOT_FOUND", "Адрес API не найден."), status=404)
+def unknown_api(request):
+    return JsonResponse(error_body("NOT_FOUND", "Адрес API не найден."), status=404)
