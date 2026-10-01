@@ -75,7 +75,7 @@ export async function getStudents(filters = {}) {
     const query = params.toString();
     
     let data;
-    if(params.size > 5){ // page и page_size тоже идут за фильтры
+    if(params.size > 5){
         data = await request("", {
             method: "QUERY",
             body: JSON.stringify(Object.fromEntries(params))

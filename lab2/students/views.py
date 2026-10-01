@@ -1,41 +1,25 @@
-import re
-from django.conf import settings
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
-from .constants import ISU_PATTERN
-from .error_handlers import error_body
-from .exceptions import ApplicationError
-from .repository import JsonStudentRepository
-from .serializers import ListQuerySerializer, StudentSerializer
-from .services import StudentService
-
-
-def get_service():
-    return StudentService(JsonStudentRepository(settings.STUDENTS_FILE))
-
-
-def validate_isu_id(isu_id):
-    if not re.fullmatch(ISU_PATTERN, isu_id):
-        raise ApplicationError(422, "INVALID_ISU_ID", "ИСУ ID должен содержать ровно 6 цифр.",
-                               {"isuId": ["Ожидается 6 цифр."]})
-
-
-def parse_student(data, partial=False):
-    serializer = StudentSerializer(data=data, partial=partial)
-    serializer.is_valid(raise_exception=True)
-    student = dict(serializer.validated_data)
-    if "settlementDate" in student:
-        student["settlementDate"] = student["settlementDate"].isoformat()
-    return student
+from .errors import ApplicationError, error_body
+from .serializers import validate_isu_id, ListQuerySerializer, StudentSerializer
+from .services import (
+    get_student, list_students, create_student, update_student, delete_student,
+)
 
 
 class StudentListView(APIView):
-    http_method_names = ["get", "query", "post", "head", "options"]
+    http_method_names = ["get", "post", "head", "options"]
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
+        """Вернуть отфильтрованный список студентов.
+
+        Args:
+            request: HTTP-запрос с параметрами фильтрации.
+        """
         repeated = {k: ["Параметр должен быть указан один раз."] for k in request.query_params
                     if len(request.query_params.getlist(k)) > 1}
         if repeated:
@@ -43,39 +27,73 @@ class StudentListView(APIView):
         serializer = ListQuerySerializer(data=request.query_params.dict())
         if not serializer.is_valid():
             raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
-        return Response(get_service().list(serializer.validated_data))
+        return Response(list_students(serializer.validated_data))
 
-    def post(self, request):
-        student = get_service().create(parse_student(request.data))
+    def post(self, request: Request) -> Response:
+        """Создать студента из данных запроса.
+
+        Args:
+            request: HTTP-запрос с данными нового студента.
+        """
+        serializer = StudentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        student_data = dict(serializer.validated_data)
+        student = create_student(student_data)
         location = reverse("student-detail", kwargs={"isu_id": student["isuId"]}, request=request)
         return Response(student, status=status.HTTP_201_CREATED, headers={"Location": location})
-    def query(self, request):
-        serializer = ListQuerySerializer(data=request.data)
-        if not serializer.is_valid():
-            raise ApplicationError(400, "INVALID_QUERY", "Некорректные параметры запроса.", serializer.errors)
-        params = serializer.validated_data
-        service = get_service()
-        page_of_students = service.list(params)
-        return Response(page_of_students)
 
 
 class StudentDetailView(APIView):
-    http_method_names = ["get", "patch", "delete", "head", "options"]
+    http_method_names = ["get", "query", "patch", "delete", "head", "options"]
 
-    def get(self, request, isu_id):
-        validate_isu_id(isu_id)
-        return Response(get_service().get(isu_id))
+    def get(self, request: Request, isu_id: str) -> Response:
+        """Вернуть студента по ИСУ ID.
 
-    def patch(self, request, isu_id):
+        Args:
+            request: Исходный HTTP-запрос.
+            isu_id: Идентификатор студента.
+        """
         validate_isu_id(isu_id)
-        changes = parse_student(request.data, partial=True)
-        return Response(get_service().update(isu_id, changes))
+        return Response(get_student(isu_id))
 
-    def delete(self, request, isu_id):
+    def query(self, request: Request, isu_id: str) -> Response:
+        """Обработать QUERY-запрос так же, как GET.
+
+        Args:
+            request: Исходный HTTP-запрос.
+            isu_id: Идентификатор студента.
+        """
+        return self.get(request, isu_id)
+
+    def patch(self, request: Request, isu_id: str) -> Response:
+        """Частично обновить данные студента.
+
+        Args:
+            request: HTTP-запрос с изменяемыми полями.
+            isu_id: Идентификатор студента.
+        """
         validate_isu_id(isu_id)
-        get_service().delete(isu_id)
+        serializer = StudentSerializer(data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        changes = dict(serializer.validated_data)
+        return Response(update_student(isu_id, changes))
+
+    def delete(self, request: Request, isu_id: str) -> Response:
+        """Удалить студента по ИСУ ID.
+
+        Args:
+            request: Исходный HTTP-запрос.
+            isu_id: Идентификатор студента.
+        """
+        validate_isu_id(isu_id)
+        delete_student(isu_id)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def unknown_api(request):
+def unknown_api(request: Request) -> JsonResponse:
+    """Вернуть ошибку для неизвестного API-адреса.
+
+    Args:
+        request: Исходный HTTP-запрос.
+    """
     return JsonResponse(error_body("NOT_FOUND", "Адрес API не найден."), status=404)
