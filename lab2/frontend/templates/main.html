@@ -28,7 +28,8 @@
                 <div class="form-grid filter-grid">
                     <div class="form-group">
                         <label for="filter-full-name">ФИО</label>
-                        <input id="filter-full-name" type="search" placeholder="Иванов">
+                        <input id="filter-full-name" type="search" placeholder="Иванов Иван Иванович" maxlength="100"
+                            pattern="[A-Za-zА-Яа-яЁё ]+">
                     </div>
 
                     <div class="form-group">
@@ -131,7 +132,7 @@
                     <div class="form-group full-width">
                         <label for="full-name">ФИО студента</label>
                         <input id="full-name" type="text" required minlength="5" maxlength="100"
-                            placeholder="Иванов Иван Иванович">
+                            placeholder="Иванов Иван Иванович" pattern="[A-Za-zА-Яа-яЁё ]+">
                         <span class="error" data-error-for="fullName"></span>
                     </div>
 

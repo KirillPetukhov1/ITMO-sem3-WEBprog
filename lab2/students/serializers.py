@@ -6,6 +6,8 @@ from typing import Any, Iterable
 DEFAULT_PAGE_SIZE = 10
 MAX_PAGE_SIZE = 100
 MAX_PAGE_NUMBER = 2_147_483_647
+FULL_NAME_PATTERN = r"\A[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё ]+\Z"
+FULL_NAME_ERROR = "допустимы только латинские и русские буквы и пробелы"
 GROUP_PATTERN = r"\A[A-Z][0-9]{4}\Z"
 ISU_PATTERN = r"\A[0-9]{6}\Z"
 SORT_FIELDS = (
@@ -39,7 +41,10 @@ def validate_isu_id(isu_id: str) -> None:
 
 
 class StudentSerializer(serializers.Serializer):
-    fullName = serializers.CharField(min_length=5, max_length=100)
+    fullName = serializers.RegexField(
+        FULL_NAME_PATTERN, min_length=5, max_length=100,
+        error_messages={"invalid": FULL_NAME_ERROR},
+    )
     group = serializers.RegexField(GROUP_PATTERN, max_length=5)
     isuId = serializers.RegexField(ISU_PATTERN, max_length=6)
     dormitory = serializers.IntegerField(min_value=1, max_value=99)
@@ -77,7 +82,10 @@ class StudentSerializer(serializers.Serializer):
 
 
 class ListQuerySerializer(serializers.Serializer):
-    fullName = serializers.CharField(required=False, max_length=100)
+    fullName = serializers.RegexField(
+        FULL_NAME_PATTERN, required=False, max_length=100,
+        error_messages={"invalid": FULL_NAME_ERROR},
+    )
     group = serializers.RegexField(GROUP_PATTERN, required=False, max_length=5)
     isuId = serializers.RegexField(ISU_PATTERN, required=False, max_length=6)
     dormitory = serializers.IntegerField(required=False, min_value=1, max_value=99)
