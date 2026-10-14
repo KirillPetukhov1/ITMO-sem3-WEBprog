@@ -1,0 +1,621 @@
+{
+  "info": {
+    "name": "Students Lab 3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run in order with a dedicated test student. QUERY is a real HTTP method."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 Register USER",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/register",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{user_username}}\",\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Login USER",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{user_username}}\",\n  \"password\": \"{{user_password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "if (pm.response.code === 200) { const t = pm.response.json(); pm.environment.set(\"access_token\", t.accessToken); pm.environment.set(\"refresh_token\", t.refreshToken); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 USER reads students",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/students?page=1&page_size=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 USER cannot create",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isuId\": {{student_isu}},\n  \"fullName\": \"Иванов Иван Иванович\",\n  \"group\": \"M3301\",\n  \"dormitory\": 8,\n  \"room\": 101,\n  \"settlementDate\": \"2026-09-01\",\n  \"isForeigner\": false,\n  \"notes\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([403]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Login ADMIN",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/login",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{admin_username}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "if (pm.response.code === 200) { const t = pm.response.json(); pm.environment.set(\"access_token\", t.accessToken); pm.environment.set(\"refresh_token\", t.refreshToken); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Create student",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isuId\": {{student_isu}},\n  \"fullName\": \"Иванов Иван Иванович\",\n  \"group\": \"M3301\",\n  \"dormitory\": 8,\n  \"room\": 101,\n  \"settlementDate\": \"2026-09-01\",\n  \"isForeigner\": false,\n  \"notes\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([201]));",
+              "pm.test(\"Location header\", () => pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/api/students/\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Duplicate ISU",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isuId\": {{student_isu}},\n  \"fullName\": \"Иванов Иван Иванович\",\n  \"group\": \"M3301\",\n  \"dormitory\": 8,\n  \"room\": 101,\n  \"settlementDate\": \"2026-09-01\",\n  \"isForeigner\": false,\n  \"notes\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([409]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 Get student",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/students/{{student_isu}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 Filter and sort",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/students?group=M3301&dormitory=8&sortBy=fullName&order=asc&page=1&page_size=10"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 QUERY with JSON",
+      "request": {
+        "method": "QUERY",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"group\": \"M3301\",\n  \"isForeigner\": false,\n  \"page\": 1,\n  \"page_size\": 10\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 PATCH student",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students/{{student_isu}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"room\": 102,\n  \"notes\": \"\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 Immutable ISU",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students/{{student_isu}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isuId\": {{student_isu}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([422]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 Missing page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/students?page=2147483647"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([404]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 PUT is absent",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/students/{{student_isu}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([405]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 Refresh rotation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/refresh",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([200]));",
+              "pm.environment.set(\"old_refresh_token\", pm.environment.get(\"refresh_token\"));",
+              "if (pm.response.code === 200) { const t = pm.response.json(); pm.environment.set(\"access_token\", t.accessToken); pm.environment.set(\"refresh_token\", t.refreshToken); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 Old refresh rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/refresh",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{old_refresh_token}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 Delete student",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{base_url}}/api/students/{{student_isu}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([204]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "18 Missing student",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/students/{{student_isu}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([404]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "19 Logout",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/logout",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([204]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "20 Revoked refresh rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/auth/refresh",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([401]));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
