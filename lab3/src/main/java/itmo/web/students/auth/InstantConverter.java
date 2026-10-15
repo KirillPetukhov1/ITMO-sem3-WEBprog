@@ -6,9 +6,7 @@ import jakarta.persistence.Converter;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-/**
- * Explicit Instant mapping for JPA 3.1 / EclipseLink 4; columns are PostgreSQL timestamptz.
- */
+
 @Converter(autoApply = true)
 public class InstantConverter implements AttributeConverter<Instant, Timestamp> {
     @Override

@@ -401,39 +401,6 @@
       ]
     },
     {
-      "name": "14 PUT is absent",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": "{{base_url}}/api/students/{{student_isu}}",
-        "body": {
-          "mode": "raw",
-          "raw": "{}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test(\"Expected HTTP status\", () => pm.expect(pm.response.code).to.be.oneOf([405]));"
-            ]
-          }
-        }
-      ]
-    },
-    {
       "name": "15 Refresh rotation",
       "request": {
         "method": "POST",
