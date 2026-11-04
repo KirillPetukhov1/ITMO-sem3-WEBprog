@@ -1,0 +1,42 @@
+server:
+  port: ${SERVER_PORT:8080}
+spring:
+  config:
+    import: "file:./././.env[.properties]"
+  application:
+    name: students-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/students}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  servlet:
+    multipart:
+      enabled: false
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: students-api
+    audience: students-api
+    access-ttl: 15m
+    refresh-ttl: 7d
+  cors-origins: ${CORS_ORIGINS:http://localhost:5500,http://127.0.0.1:5500}
+  admin:
+    username: ${ADMIN_USERNAME:}
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
+springdoc:
+  api-docs:
+    version: OPENAPI_3_1
+  swagger-ui:
+    path: /swagger-ui.html
+logging:
+  level:
+    ru.itmo.students: INFO
