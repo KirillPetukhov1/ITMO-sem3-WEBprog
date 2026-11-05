@@ -6,7 +6,8 @@ import { getErrorMessage } from '../api/httpClient.js'
 import { getStudent, updateStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function EditStudentPage() {
+export default function EditStudentPage() 
+{
   const { isuId } = useParams()
   const { authFetch } = useAuth()
   const navigate = useNavigate()
@@ -15,22 +16,27 @@ export default function EditStudentPage() {
   const [message, setMessage] = useState('грузим...')
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
+  useEffect(() => 
+    {
     const controller = new AbortController()
 
     async function loadStudent() {
-      try {
+      try 
+      {
         const result = await getStudent(isuId, authFetch, controller.signal)
 
-        if (controller.signal.aborted) {
+        if (controller.signal.aborted) 
+        {
           return
         }
 
         setStudent(result)
         setMessage('')
       }
-      catch (error) {
-        if (error.name !== 'AbortError') {
+      catch (error) 
+      {
+        if (error.name !== 'AbortError') 
+        {
           if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
         }
       }
@@ -40,30 +46,36 @@ export default function EditStudentPage() {
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleSave(values) {
-    // те же поля, но теперь patch, ису сюда не тащим
-    if (submitting) {
+  async function handleSave(values) 
+  {
+    // ису сюда не тащим
+    if (submitting) 
+    {
       return
     }
 
     setMessage('')
     setSubmitting(true)
 
-    try {
+    try 
+    {
       const updated = await updateStudent(isuId, values, authFetch)
       navigate('/students/' + updated.isuId, { replace: true })
     }
-    catch {
+    catch 
+    {
       if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
     }
-    finally {
+    finally 
+    {
       setSubmitting(false)
     }
   }
 
   let form = null
 
-  if (student !== null) {
+  if (student !== null) 
+  {
     form = <StudentForm student={student} onSubmit={handleSave}
       submitting={submitting} buttonText="сохранить" />
   }

@@ -2,10 +2,12 @@ import { NavLink } from 'react-router-dom'
 
 import { useAuth } from '../auth/AuthContext.js'
 
-export default function Navigation() {
+export default function Navigation() 
+{
   const { tokens, user, restoring } = useAuth()
 
-  if (restoring) {
+  if (restoring) 
+  {
     return null
   }
 
@@ -16,14 +18,17 @@ export default function Navigation() {
     </>
   )
 
-  if (tokens !== null) {
+  if (tokens !== null) 
+  {
     let adminLink = null
 
-    if (user?.role === 'ADMIN') {
+    if (user?.role === 'ADMIN') 
+    {
       adminLink = <NavLink to="/students/new">создать студента</NavLink>
     }
 
-    links = (
+    links = 
+    (
       <>
         <NavLink to="/students" end>студенты</NavLink>
         {adminLink}

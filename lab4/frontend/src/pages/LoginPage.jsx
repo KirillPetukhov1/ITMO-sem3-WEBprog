@@ -6,16 +6,19 @@ import { useAuth } from '../auth/AuthContext.js'
 import { getErrorMessage } from '../api/httpClient.js'
 import { login } from '../api/authApi.js'
 
-export default function LoginPage() {
+export default function LoginPage() 
+{
   const [errorMessage, setErrorMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { setTokens, restoring, sessionMessage, setSessionMessage } = useAuth()
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event) 
+  {
     event.preventDefault()
 
-    if (isSubmitting || restoring) {
+    if (isSubmitting || restoring) 
+    {
       return
     }
 
@@ -27,16 +30,19 @@ export default function LoginPage() {
     const username = data.get('username')
     const password = data.get('password')
 
-    try {
+    try 
+    {
       const session = await login({ username, password })
       // токен в память, сами идём в профиль
       setTokens(session)
       navigate('/profile', { replace: true })
     }
-    catch {
+    catch 
+    {
       setErrorMessage(getErrorMessage(error))
     }
-    finally {
+    finally 
+    {
       setIsSubmitting(false)
     }
   }

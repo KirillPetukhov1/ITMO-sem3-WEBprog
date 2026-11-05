@@ -1,10 +1,12 @@
 export default function StudentForm({ student = null, onSubmit, submitting, buttonText }) {
-  function handleSubmit(event) {
+  function handleSubmit(event) 
+  {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
     // собираем поля, потом пакуем в post или patch
-    const values = {
+    const values = 
+    {
       fullName: String(data.get('fullName')).trim(),
       group: String(data.get('group')).trim(),
       dormitory: Number(data.get('dormitory')),
@@ -14,7 +16,8 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
       notes: String(data.get('notes')).trim()
     }
 
-    if (student === null) {
+    if (student === null) 
+    {
       // ису шлём только новенькому, старому менять нельзя
       values.isuId = Number(data.get('isuId'))
     }
