@@ -7,3 +7,10 @@
   
   
 <img width="691" height="800" alt="i (1)" src="https://github.com/user-attachments/assets/86bd96e3-bf8d-4a2d-9a1f-7c1cdec371f8" />
+
+
+правки: 
+-ux ui нормальный
+-управление состояниями
+-не нужен nginx(nginx оставляем все-таки)
+-обновление студентов между клиентами(без вебсокета)
