@@ -13,10 +13,11 @@ export default function StudentsPage() {
   const [fullName, setFullName] = useState('')
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState({})
+  const [reloadKey, setReloadKey] = useState(0)
 
   const query = useMemo(() => {
-    return { ...filters, fullName, sortBy, order, page }
-  }, [filters, fullName, sortBy, order, page])
+    return { ...filters, fullName, sortBy, order, page, reloadKey }
+  }, [filters, fullName, sortBy, order, page, reloadKey])
 
   const { loading, data, error } = useStudentList(query, authFetch)
   const students = data?.results || []
@@ -70,6 +71,9 @@ export default function StudentsPage() {
       <p role={error === '' ? 'status' : 'alert'} hidden={message === ''}>
         {message}
       </p>
+      {error && <button type="button" onClick={() => setReloadKey((value) => value + 1)}>
+        Повторить загрузку
+      </button>}
 
       <form onSubmit={handleSearch}>
         <label htmlFor="fullNameField">фио студента</label>

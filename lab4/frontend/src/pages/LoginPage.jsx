@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 import Button from "../components/Button.jsx"
 import { useAuth } from '../auth/AuthContext.js'
-import { errorText } from '../api/errors.js'
-
+import { getErrorMessage } from '../api/httpClient.js'
+import { login } from '../api/authApi.js'
 
 export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('')
@@ -26,35 +26,15 @@ export default function LoginPage() {
     const data = new FormData(event.currentTarget)
     const username = data.get('username')
     const password = data.get('password')
-    const body = JSON.stringify({ username, password })
 
     try {
-      const response = await fetch('/api/auth/session/login',
-        {
-          method: 'POST',
-          headers:
-          {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          credentials: 'same-origin',
-          body: body
-        })
-
-      if (!response.ok) {
-        setErrorMessage(response.status === 401
-          ? 'логин или пароль мимо'
-          : await errorText(response))
-        return
-      }
-
-      const session = await response.json()
+      const session = await login({ username, password })
       // токен в память, сами идём в профиль
       setTokens(session)
       navigate('/profile', { replace: true })
     }
     catch {
-      setErrorMessage('связи нет, связь брат')
+      setErrorMessage(getErrorMessage(error))
     }
     finally {
       setIsSubmitting(false)

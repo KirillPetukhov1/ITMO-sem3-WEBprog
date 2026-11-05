@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../auth/AuthContext.js'
-import { errorText } from '../api/errors.js'
+import { getErrorMessage } from '../api/httpClient.js'
+import { createStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
 export default function CreateStudentPage() {
@@ -21,23 +22,11 @@ export default function CreateStudentPage() {
     setSubmitting(true)
 
     try {
-      const response = await authFetch('/api/students',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(student)
-        })
-
-      if (!response.ok) {
-        setMessage(await errorText(response))
-        return
-      }
-
-      const created = await response.json()
+      const created = await createStudent(student, authFetch)
       navigate('/students/' + created.isuId, { replace: true })
     }
     catch {
-      setMessage('связи нет, связь брат')
+      if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
     }
     finally {
       setSubmitting(false)

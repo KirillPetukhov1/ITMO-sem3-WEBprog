@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../auth/AuthContext.js'
-import { errorText } from '../api/errors.js'
+import { getErrorMessage } from '../api/httpClient.js'
+import { getStudent, deleteStudent } from '../api/studentsApi.js'
 
 export default function StudentDetailsPage() {
   const { isuId } = useParams()
@@ -19,17 +20,7 @@ export default function StudentDetailsPage() {
 
     async function loadStudent() {
       try {
-        const response = await authFetch('/api/students/' + isuId,
-          {
-            signal: controller.signal
-          })
-
-        if (!response.ok) {
-          setMessage(await errorText(response))
-          return
-        }
-
-        const result = await response.json()
+        const result = await getStudent(isuId, authFetch, controller.signal)
 
         if (controller.signal.aborted) {
           return
@@ -40,7 +31,7 @@ export default function StudentDetailsPage() {
       }
       catch (error) {
         if (error.name !== 'AbortError') {
-          setMessage('связи нет, связь брат')
+          setMessage(getErrorMessage(error))
         }
       }
     }
@@ -59,20 +50,12 @@ export default function StudentDetailsPage() {
     setDeleting(true)
 
     try {
-      const response = await authFetch('/api/students/' + isuId,
-        {
-          method: 'DELETE'
-        })
-
-      if (!response.ok) {
-        setDeleteMessage(await errorText(response))
-        return
-      }
+      await deleteStudent(isuId, authFetch)
 
       navigate('/students', { replace: true })
     }
     catch {
-      setDeleteMessage('связи нет, связь брат')
+      if (error.name !== 'AbortError') setDeleteMessage(getErrorMessage(error))
     }
     finally {
       setDeleting(false)

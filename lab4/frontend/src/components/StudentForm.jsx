@@ -19,11 +19,16 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
       values.isuId = Number(data.get('isuId'))
     }
 
+    const nameField = event.currentTarget.elements.namedItem('fullName')
+    nameField.setCustomValidity(values.fullName.length < 5 || values.fullName.length > 100
+      ? 'ФИО должно содержать от 5 до 100 символов без пробелов по краям' : '')
+    if (!event.currentTarget.reportValidity()) return
     onSubmit(values)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="student-form">
+    <form onSubmit={handleSubmit} className="student-form"
+      onInput={(event) => event.target.setCustomValidity?.('')}>
       <label htmlFor="isuField">номер ису</label>
       <input id="isuField" name="isuId" type="number" min="100000" max="999999"
         defaultValue={student?.isuId || ''} disabled={student !== null} required />

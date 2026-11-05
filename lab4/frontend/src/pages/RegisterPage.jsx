@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import { errorText } from '../api/errors.js'
+import { getErrorMessage } from '../api/httpClient.js'
+import { register } from '../api/authApi.js'
 import Button from "../components/Button"
 
 export default function RegisterPage() {
@@ -25,34 +26,25 @@ export default function RegisterPage() {
     const username = data.get('username').trim()
     const password = data.get('password')
 
-    const body = JSON.stringify({ username, email, password })
+    if (new TextEncoder().encode(password).length > 72) {
+      setIsError(true)
+      setMessage('Пароль должен занимать не более 72 байт UTF-8.')
+      return
+    }
     setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/auth/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: body
-        })
-
-      if (response.status === 201) {
-        form.reset()
-        setMessage('аккаунт готов, прошу к нашему шалашу')
-        return
-      }
-
-      setIsError(true)
-      setMessage(await errorText(response))
+      await register({ username, email, password })
+      form.reset()
+      setMessage('аккаунт готов, прошу к нашему шалашу')
     }
-    catch {
+    catch (error) {
       setIsError(true)
-      setMessage('связи нет, связь брат')
+      setMessage(getErrorMessage(error))
     }
     finally {
       setIsSubmitting(false)
     }
-
   }
 
   return (

@@ -1,18 +1,7 @@
 import { Observable, concat, distinctUntilChanged, of, switchMap, timer } from 'rxjs'
 
-import { errorText } from './errors.js'
-
-function studentUrl(query) {
-  const params = new URLSearchParams()
-
-  for (const [name, value] of Object.entries(query)) {
-    if (value !== '' && value !== null && value !== undefined) {
-      params.set(name, String(value))
-    }
-  }
-
-  return '/api/students?' + params.toString()
-}
+import { getErrorMessage } from './httpClient.js'
+import { listStudents } from './studentsApi.js'
 
 function studentRequest(query, authFetch) {
   return new Observable((observer) => {
@@ -20,19 +9,13 @@ function studentRequest(query, authFetch) {
 
     async function loadStudents() {
       try {
-        const response = await authFetch(studentUrl(query), { signal: controller.signal })
-
-        if (!response.ok) {
-          throw new Error('ошибка загрузона:' + response.status + '. ' + await errorText(response))
-        }
-
-        const data = await response.json()
+        const data = await listStudents(query, authFetch, controller.signal)
         observer.next({ loading: false, data, error: '' })
         observer.complete()
       }
       catch (error) {
         if (error.name !== 'AbortError') {
-          const message = error instanceof TypeError ? 'связи нет, связь брат' : error.message
+          const message = getErrorMessage(error)
           observer.next({ loading: false, data: null, error: message })
           observer.complete()
         }

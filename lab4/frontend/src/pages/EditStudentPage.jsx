@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../auth/AuthContext.js'
-import { errorText } from '../api/errors.js'
+import { getErrorMessage } from '../api/httpClient.js'
+import { getStudent, updateStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
 export default function EditStudentPage() {
@@ -19,17 +20,7 @@ export default function EditStudentPage() {
 
     async function loadStudent() {
       try {
-        const response = await authFetch('/api/students/' + isuId,
-          {
-            signal: controller.signal
-          })
-
-        if (!response.ok) {
-          setMessage(await errorText(response))
-          return
-        }
-
-        const result = await response.json()
+        const result = await getStudent(isuId, authFetch, controller.signal)
 
         if (controller.signal.aborted) {
           return
@@ -40,7 +31,7 @@ export default function EditStudentPage() {
       }
       catch (error) {
         if (error.name !== 'AbortError') {
-          setMessage('связи нет, связь брат')
+          if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
         }
       }
     }
@@ -59,23 +50,11 @@ export default function EditStudentPage() {
     setSubmitting(true)
 
     try {
-      const response = await authFetch('/api/students/' + isuId,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values)
-        })
-
-      if (!response.ok) {
-        setMessage(await errorText(response))
-        return
-      }
-
-      const updated = await response.json()
+      const updated = await updateStudent(isuId, values, authFetch)
       navigate('/students/' + updated.isuId, { replace: true })
     }
     catch {
-      setMessage('связи нет, связь брат')
+      if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
     }
     finally {
       setSubmitting(false)

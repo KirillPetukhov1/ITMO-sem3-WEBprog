@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { createAuthFetch, getErrorMessage } from '../api/httpClient.js'
+import { refreshSession, logout, getCurrentUser } from '../api/authApi.js'
+
 import { AuthContext } from './AuthContext.js'
 
 export function AuthProvider({ children }) {
@@ -11,6 +14,7 @@ export function AuthProvider({ children }) {
 
   const sessionRef = useRef(null)
   const generationRef = useRef(0)
+  const sessionIdRef = useRef(0)
   const refreshingRef = useRef(null)
 
   const setTokens = useCallback((next, clearUser = true) => {
@@ -18,6 +22,7 @@ export function AuthProvider({ children }) {
     sessionRef.current = next
     updateTokens(next)
     if (clearUser) {
+      sessionIdRef.current += 1
       setUser(null)
       setUserMessage('')
     }
@@ -31,12 +36,7 @@ export function AuthProvider({ children }) {
 
     const generation = generationRef.current
     const operation = (async () => {
-      const response = await fetch('/api/auth/session/refresh',
-        {
-          method: 'POST',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' },
-          credentials: 'same-origin'
-        })
+      const response = refreshSession()
 
       if (generationRef.current !== generation) {
         return sessionRef.current
@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
 
       if (response.status === 401) {
         setTokens(null)
+        setSessionMessage('Сессия истекла. Войдите снова')
         return null
       }
 
@@ -88,45 +89,15 @@ export function AuthProvider({ children }) {
     }
   }, [refresh])
 
-  const authFetch = useCallback(async (url, options = {}) => {
-    const send = (accessToken) => {
-      const headers = new Headers(options.headers)
-      headers.set('Authorization', 'Bearer ' + accessToken)
-      return fetch(url, { ...options, headers })
+  const authFetch = useMemo(() => createAuthFetch({
+    getSession: () => sessionRef.current,
+    getSessionId: () => sessionIdRef.current,
+    refresh,
+    expire: () => {
+      setTokens(null)
+      setSessionMessage('Сессия истекла. Войдите снова.')
     }
-
-    let sentToken = sessionRef.current?.accessToken
-
-    if (!sentToken) {
-      const session = await refresh()
-      sentToken = session?.accessToken
-    }
-
-    if (!sentToken) {
-      throw new Error('сначала зайди в аккаунт')
-    }
-
-    const response = await send(sentToken)
-
-    // токен стух - обновляем и пробуем запрос ещё раз
-    if (response.status !== 401) {
-      return response
-    }
-
-    let nextToken = sessionRef.current?.accessToken
-
-    if (nextToken === sentToken) {
-      const session = await refresh()
-      nextToken = session?.accessToken
-    }
-
-    if (!nextToken) {
-      setSessionMessage('сессия всё, зайди ещё раз')
-      return response
-    }
-
-    return send(nextToken)
-  }, [refresh])
+  }), [refresh, setTokens])
 
   const signOut = useCallback(async () => {
     if (refreshingRef.current !== null) {
@@ -138,16 +109,7 @@ export function AuthProvider({ children }) {
       }
     }
 
-    const response = await fetch('/api/auth/session/logout',
-      {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin'
-      })
-
-    if (!response.ok) {
-      throw new Error('выход не вышел: ' + response.status)
-    }
+    await logout()
 
     setTokens(null)
     setSessionMessage('')
@@ -163,24 +125,15 @@ export function AuthProvider({ children }) {
     async function loadUser() {
       // профиль один на все вкладки
       try {
-        const response = await authFetch('/api/auth/session/me')
-
-        if (!response.ok) {
-          if (active) {
-            setUserMessage('профиль не загрузился: ' + response.status)
-          }
-          return
-        }
-
-        const result = await response.json()
+        const result = await getCurrentUser(authFetch)
         if (active) {
           setUser(result)
           setUserMessage('')
         }
       }
-      catch {
-        if (active) {
-          setUserMessage('связи нет, связь брат')
+      catch (error) {
+        if (active && error.name !== 'AbortError') {
+          setUserMessage(getErrorMessage(error))
         }
       }
     }
