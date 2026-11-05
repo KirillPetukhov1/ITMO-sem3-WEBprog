@@ -5,7 +5,8 @@ import { useAuth } from '../auth/AuthContext.js'
 import { getErrorMessage } from '../api/httpClient.js'
 import { getStudent, deleteStudent } from '../api/studentsApi.js'
 
-export default function StudentDetailsPage() {
+export default function StudentDetailsPage() 
+{
   const { isuId } = useParams()
   const { authFetch, user } = useAuth()
   const navigate = useNavigate()
@@ -15,22 +16,27 @@ export default function StudentDetailsPage() {
   const [deleting, setDeleting] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     const controller = new AbortController()
 
     async function loadStudent() {
-      try {
+      try 
+      {
         const result = await getStudent(isuId, authFetch, controller.signal)
 
-        if (controller.signal.aborted) {
+        if (controller.signal.aborted) 
+        {
           return
         }
 
         setStudent(result)
         setMessage('')
       }
-      catch (error) {
-        if (error.name !== 'AbortError') {
+      catch (error) 
+      {
+        if (error.name !== 'AbortError') 
+        {
           setMessage(getErrorMessage(error))
         }
       }
@@ -40,31 +46,37 @@ export default function StudentDetailsPage() {
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleDelete() {
+  async function handleDelete() 
+  {
     // сначала спрашиваем, потом уже удаляем
-    if (deleting || !window.confirm('удалить студента ' + student.fullName + '?')) {
+    if (deleting || !window.confirm('удалить студента ' + student.fullName + '?')) 
+    {
       return
     }
 
     setDeleteMessage('')
     setDeleting(true)
 
-    try {
+    try 
+    {
       await deleteStudent(isuId, authFetch)
 
       navigate('/students', { replace: true })
     }
-    catch {
+    catch (error) 
+    {
       if (error.name !== 'AbortError') setDeleteMessage(getErrorMessage(error))
     }
-    finally {
+    finally 
+    {
       setDeleting(false)
     }
   }
 
   let information = <p>{message}</p>
 
-  if (student !== null) {
+  if (student !== null) 
+  {
     information = (
       <dl>
         <dt>номер ису</dt><dd>{student.isuId}</dd>
@@ -81,7 +93,8 @@ export default function StudentDetailsPage() {
 
   let adminActions = null
 
-  if (user?.role === 'ADMIN' && student !== null) {
+  if (user?.role === 'ADMIN' && student !== null) 
+  {
     adminActions = (
       <div className="actions">
         <Link to={'/students/' + isuId + '/edit'}>изменить</Link>

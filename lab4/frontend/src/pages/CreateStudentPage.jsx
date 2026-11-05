@@ -6,29 +6,35 @@ import { getErrorMessage } from '../api/httpClient.js'
 import { createStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function CreateStudentPage() {
+export default function CreateStudentPage() 
+{
   const { authFetch } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
 
-  async function handleCreate(student) {
-    // пока сохраняем, второй клик мимо
-    if (submitting) {
+  async function handleCreate(student) 
+  {
+    
+    if (submitting) 
+    {
       return
     }
 
     setMessage('')
     setSubmitting(true)
 
-    try {
+    try 
+    {
       const created = await createStudent(student, authFetch)
       navigate('/students/' + created.isuId, { replace: true })
     }
-    catch {
+    catch 
+    {
       if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
     }
-    finally {
+    finally 
+    {
       setSubmitting(false)
     }
   }

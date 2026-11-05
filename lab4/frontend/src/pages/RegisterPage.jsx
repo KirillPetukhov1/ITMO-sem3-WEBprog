@@ -5,15 +5,18 @@ import { getErrorMessage } from '../api/httpClient.js'
 import { register } from '../api/authApi.js'
 import Button from "../components/Button"
 
-export default function RegisterPage() {
+export default function RegisterPage() 
+{
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event) 
+  {
     event.preventDefault()
 
-    if (isSubmitting) {
+    if (isSubmitting) 
+    {
       return
     }
 
@@ -26,23 +29,27 @@ export default function RegisterPage() {
     const username = data.get('username').trim()
     const password = data.get('password')
 
-    if (new TextEncoder().encode(password).length > 72) {
+    if (new TextEncoder().encode(password).length > 72) 
+    {
       setIsError(true)
       setMessage('Пароль должен занимать не более 72 байт UTF-8.')
       return
     }
     setIsSubmitting(true)
 
-    try {
+    try 
+    {
       await register({ username, email, password })
       form.reset()
       setMessage('аккаунт готов, прошу к нашему шалашу')
     }
-    catch (error) {
+    catch (error) 
+    {
       setIsError(true)
       setMessage(getErrorMessage(error))
     }
-    finally {
+    finally 
+    {
       setIsSubmitting(false)
     }
   }

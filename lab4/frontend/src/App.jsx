@@ -16,18 +16,21 @@ import EditStudentPage from './pages/EditStudentPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Navigation from './components/Navigation.jsx'
 
-function StudentRoute({ edit = false }) {
+function StudentRoute({ edit = false })
+{
   const { isuId } = useParams()
 
   // ису другой - карточку тоже собираем заново
-  if (edit) {
+  if (edit) 
+  {
     return <EditStudentPage key={isuId} />
   }
 
   return <StudentDetailsPage key={isuId} />
 }
 
-export default function App() {
+export default function App() 
+{
   return (
     <BrowserRouter>
       <Navigation />

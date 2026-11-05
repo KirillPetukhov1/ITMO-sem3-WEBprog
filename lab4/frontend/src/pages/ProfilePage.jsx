@@ -3,28 +3,34 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../auth/AuthContext.js'
 
-export default function ProfilePage() {
+export default function ProfilePage() 
+{
   const { user, userMessage, signOut } = useAuth()
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  async function handleLogout() {
-    if (isLoggingOut) {
+  async function handleLogout() 
+  {
+    if (isLoggingOut) 
+    {
       return
     }
 
     setErrorMessage('')
     setIsLoggingOut(true)
 
-    try {
+    try 
+    {
       await signOut()
       navigate('/login', { replace: true })
     }
-    catch {
-      setErrorMessage('выход не вышел, проверь связь')
+    catch 
+    {
+      setErrorMessage('выход не вышел, ты тут навечно...')
     }
-    finally {
+    finally 
+    {
       setIsLoggingOut(false)
     }
   }
@@ -32,7 +38,8 @@ export default function ProfilePage() {
   let profile = null
   let roleInfo = null
 
-  if (user !== null) {
+  if (user !== null) 
+  {
     profile = (
       <dl>
         <dt>логин</dt><dd>{user.username}</dd>
@@ -41,8 +48,9 @@ export default function ProfilePage() {
       </dl>
     )
 
-    if (user.role !== 'ADMIN') {
-      roleInfo = <p>смотреть можно, а создавать, менять и удалять - только админу</p>
+    if (user.role !== 'ADMIN') 
+    {
+      roleInfo = <p>только смотреть, руками не трогать</p>
     }
   }
 
