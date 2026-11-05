@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { AuthContext } from './AuthContext.js'
 
-export function AuthProvider({ children })
-{
+export function AuthProvider({ children }) {
   const [tokens, updateTokens] = useState(null)
   const [restoring, setRestoring] = useState(true)
   const [sessionMessage, setSessionMessage] = useState('')
@@ -13,64 +13,54 @@ export function AuthProvider({ children })
   const generationRef = useRef(0)
   const refreshingRef = useRef(null)
 
-  const setTokens = useCallback((next, clearUser = true) =>
-  {
+  const setTokens = useCallback((next, clearUser = true) => {
     generationRef.current += 1
     sessionRef.current = next
     updateTokens(next)
-    if (clearUser)
-    {
+    if (clearUser) {
       setUser(null)
       setUserMessage('')
     }
   }, [])
 
-  const refresh = useCallback(() =>
-  {
+  const refresh = useCallback(() => {
     // обновлялка уже идёт, вторую не плодим
-    if (refreshingRef.current !== null)
-    {
+    if (refreshingRef.current !== null) {
       return refreshingRef.current
     }
 
     const generation = generationRef.current
-    const operation = (async () =>
-    {
+    const operation = (async () => {
       const response = await fetch('/api/auth/session/refresh',
-      {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin'
-      })
+        {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          credentials: 'same-origin'
+        })
 
-      if (generationRef.current !== generation)
-      {
+      if (generationRef.current !== generation) {
         return sessionRef.current
       }
 
-      if (response.status === 401)
-      {
+      if (response.status === 401) {
         setTokens(null)
         return null
       }
 
-      if (!response.ok)
-      {
+      if (!response.ok) {
         throw new Error('токен не обновился: ' + response.status)
       }
 
       const next = await response.json()
 
-      if (generationRef.current !== generation)
-      {
+      if (generationRef.current !== generation) {
         return sessionRef.current
       }
 
       // токен новый, а форму и права не сносим
       setTokens(next, false)
       return next
-    })().finally(() =>
-    {
+    })().finally(() => {
       refreshingRef.current = null
     })
 
@@ -78,36 +68,28 @@ export function AuthProvider({ children })
     return operation
   }, [setTokens])
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     let active = true
 
     refresh()
-      .catch(() =>
-      {
-        if (active)
-        {
+      .catch(() => {
+        if (active) {
           setSessionMessage('вход не вспомнился, проверь связь')
         }
       })
-      .finally(() =>
-      {
-        if (active)
-        {
+      .finally(() => {
+        if (active) {
           setRestoring(false)
         }
       })
 
-    return () =>
-    {
+    return () => {
       active = false
     }
   }, [refresh])
 
-  const authFetch = useCallback(async (url, options = {}) =>
-  {
-    const send = (accessToken) =>
-    {
+  const authFetch = useCallback(async (url, options = {}) => {
+    const send = (accessToken) => {
       const headers = new Headers(options.headers)
       headers.set('Authorization', 'Bearer ' + accessToken)
       return fetch(url, { ...options, headers })
@@ -115,35 +97,30 @@ export function AuthProvider({ children })
 
     let sentToken = sessionRef.current?.accessToken
 
-    if (!sentToken)
-    {
+    if (!sentToken) {
       const session = await refresh()
       sentToken = session?.accessToken
     }
 
-    if (!sentToken)
-    {
+    if (!sentToken) {
       throw new Error('сначала зайди в аккаунт')
     }
 
     const response = await send(sentToken)
 
-    // токен стух — обновляем и пробуем запрос ещё разок
-    if (response.status !== 401)
-    {
+    // токен стух - обновляем и пробуем запрос ещё раз
+    if (response.status !== 401) {
       return response
     }
 
     let nextToken = sessionRef.current?.accessToken
 
-    if (nextToken === sentToken)
-    {
+    if (nextToken === sentToken) {
       const session = await refresh()
       nextToken = session?.accessToken
     }
 
-    if (!nextToken)
-    {
+    if (!nextToken) {
       setSessionMessage('сессия всё, зайди ещё раз')
       return response
     }
@@ -151,29 +128,24 @@ export function AuthProvider({ children })
     return send(nextToken)
   }, [refresh])
 
-  const signOut = useCallback(async () =>
-  {
-    if (refreshingRef.current !== null)
-    {
-      try
-      {
+  const signOut = useCallback(async () => {
+    if (refreshingRef.current !== null) {
+      try {
         await refreshingRef.current
       }
-      catch
-      {
+      catch {
         // обновление упало, но выйти всё равно пробуем
       }
     }
 
     const response = await fetch('/api/auth/session/logout',
-    {
-      method: 'POST',
-      headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      credentials: 'same-origin'
-    })
+      {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin'
+      })
 
-    if (!response.ok)
-    {
+    if (!response.ok) {
       throw new Error('выход не вышел: ' + response.status)
     }
 
@@ -181,50 +153,40 @@ export function AuthProvider({ children })
     setSessionMessage('')
   }, [setTokens])
 
-  useEffect(() =>
-  {
-    if (!tokens?.accessToken)
-    {
+  useEffect(() => {
+    if (!tokens?.accessToken) {
       return
     }
 
     let active = true
 
-    async function loadUser()
-    {
-      // профиль один на все вкладки, не таскаем его по кругу
-      try
-      {
+    async function loadUser() {
+      // профиль один на все вкладки
+      try {
         const response = await authFetch('/api/auth/session/me')
 
-        if (!response.ok)
-        {
-          if (active)
-          {
+        if (!response.ok) {
+          if (active) {
             setUserMessage('профиль не загрузился: ' + response.status)
           }
           return
         }
 
         const result = await response.json()
-        if (active)
-        {
+        if (active) {
           setUser(result)
           setUserMessage('')
         }
       }
-      catch
-      {
-        if (active)
-        {
+      catch {
+        if (active) {
           setUserMessage('связи нет, связь брат')
         }
       }
     }
 
     loadUser()
-    return () =>
-    {
+    return () => {
       active = false
     }
   }, [tokens?.accessToken, authFetch])

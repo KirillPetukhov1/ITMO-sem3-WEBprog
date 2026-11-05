@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+
 import { useAuth } from '../auth/AuthContext.js'
 import { errorText } from '../api/errors.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function EditStudentPage()
-{
+export default function EditStudentPage() {
   const { isuId } = useParams()
   const { authFetch } = useAuth()
   const navigate = useNavigate()
@@ -14,39 +14,32 @@ export default function EditStudentPage()
   const [message, setMessage] = useState('грузим...')
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     const controller = new AbortController()
 
-    async function loadStudent()
-    {
-      try
-      {
+    async function loadStudent() {
+      try {
         const response = await authFetch('/api/students/' + isuId,
-        {
-          signal: controller.signal
-        })
+          {
+            signal: controller.signal
+          })
 
-        if (!response.ok)
-        {
+        if (!response.ok) {
           setMessage(await errorText(response))
           return
         }
 
         const result = await response.json()
 
-        if (controller.signal.aborted)
-        {
+        if (controller.signal.aborted) {
           return
         }
 
         setStudent(result)
         setMessage('')
       }
-      catch (error)
-      {
-        if (error.name !== 'AbortError')
-        {
+      catch (error) {
+        if (error.name !== 'AbortError') {
           setMessage('связи нет, связь брат')
         }
       }
@@ -56,28 +49,24 @@ export default function EditStudentPage()
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleSave(values)
-  {
+  async function handleSave(values) {
     // те же поля, но теперь patch, ису сюда не тащим
-    if (submitting)
-    {
+    if (submitting) {
       return
     }
 
     setMessage('')
     setSubmitting(true)
 
-    try
-    {
+    try {
       const response = await authFetch('/api/students/' + isuId,
-      {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
-      })
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(values)
+        })
 
-      if (!response.ok)
-      {
+      if (!response.ok) {
         setMessage(await errorText(response))
         return
       }
@@ -85,20 +74,17 @@ export default function EditStudentPage()
       const updated = await response.json()
       navigate('/students/' + updated.isuId, { replace: true })
     }
-    catch
-    {
+    catch {
       setMessage('связи нет, связь брат')
     }
-    finally
-    {
+    finally {
       setSubmitting(false)
     }
   }
 
   let form = null
 
-  if (student !== null)
-  {
+  if (student !== null) {
     form = <StudentForm student={student} onSubmit={handleSave}
       submitting={submitting} buttonText="сохранить" />
   }

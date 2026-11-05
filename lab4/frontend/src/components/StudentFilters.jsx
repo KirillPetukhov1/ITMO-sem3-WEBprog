@@ -1,23 +1,19 @@
-export default function StudentFilters({ onNameChange, onApply })
-{
-  function handleSubmit(event)
-  {
+export default function StudentFilters({ onNameChange, onApply }) {
+  function handleSubmit(event) {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
     const filters = {}
 
     // пустое оставляем пустым, в адрес оно потом не полезет
-    for (const name of ['group', 'isuId', 'dormitory', 'room', 'settlementDate', 'isForeigner', 'notes'])
-    {
+    for (const name of ['group', 'isuId', 'dormitory', 'room', 'settlementDate', 'isForeigner', 'notes']) {
       filters[name] = String(data.get(name) || '').trim()
     }
 
     onApply(filters)
   }
 
-  function handleReset(event)
-  {
+  function handleReset(event) {
     // чистим и форму, и применённые фильтры
     event.currentTarget.form.reset()
     onNameChange('')

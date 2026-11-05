@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+
 import { useAuth } from '../auth/AuthContext.js'
 import StudentFilters from '../components/StudentFilters.jsx'
 import useStudentList from '../hooks/useStudentList.js'
 
-export default function StudentsPage()
-{
+export default function StudentsPage() {
   const { authFetch, user } = useAuth()
 
   const [sortBy, setSortBy] = useState('isuId')
@@ -14,8 +14,7 @@ export default function StudentsPage()
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState({})
 
-  const query = useMemo(() =>
-  {
+  const query = useMemo(() => {
     return { ...filters, fullName, sortBy, order, page }
   }, [filters, fullName, sortBy, order, page])
 
@@ -35,14 +34,12 @@ export default function StudentsPage()
     setFullName(name)
   }
 
-  function handleNameChange(value)
-  {
+  function handleNameChange(value) {
     setFullName(value)
     setPage(1) // поиск новый, листаем с начала
   }
 
-  function handleApply(nextFilters)
-  {
+  function handleApply(nextFilters) {
     setFilters(nextFilters)
     setPage(1)
   }
@@ -61,8 +58,7 @@ export default function StudentsPage()
 
   let createLink = null
 
-  if (user?.role === 'ADMIN')
-  {
+  if (user?.role === 'ADMIN') {
     createLink = <Link to="/students/new">создать студента</Link>
   }
 
@@ -108,8 +104,7 @@ export default function StudentsPage()
       <p hidden={loading || error !== '' || data === null || students.length !== 0}>никого не нашлось</p>
 
       <ul>
-        {students.map((student) =>
-        {
+        {students.map((student) => {
           return (
             <li key={student.isuId}>
               <Link to={'/students/' + student.isuId}>

@@ -1,38 +1,34 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+
 import { useAuth } from '../auth/AuthContext.js'
 import { errorText } from '../api/errors.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function CreateStudentPage()
-{
+export default function CreateStudentPage() {
   const { authFetch } = useAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState('')
 
-  async function handleCreate(student)
-  {
+  async function handleCreate(student) {
     // пока сохраняем, второй клик мимо
-    if (submitting)
-    {
+    if (submitting) {
       return
     }
 
     setMessage('')
     setSubmitting(true)
 
-    try
-    {
+    try {
       const response = await authFetch('/api/students',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(student)
-      })
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(student)
+        })
 
-      if (!response.ok)
-      {
+      if (!response.ok) {
         setMessage(await errorText(response))
         return
       }
@@ -40,12 +36,10 @@ export default function CreateStudentPage()
       const created = await response.json()
       navigate('/students/' + created.isuId, { replace: true })
     }
-    catch
-    {
+    catch {
       setMessage('связи нет, связь брат')
     }
-    finally
-    {
+    finally {
       setSubmitting(false)
     }
   }

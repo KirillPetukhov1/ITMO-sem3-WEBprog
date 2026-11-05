@@ -1,7 +1,5 @@
-export default function StudentForm({ student = null, onSubmit, submitting, buttonText })
-{
-  function handleSubmit(event)
-  {
+export default function StudentForm({ student = null, onSubmit, submitting, buttonText }) {
+  function handleSubmit(event) {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
@@ -16,8 +14,7 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
       notes: String(data.get('notes')).trim()
     }
 
-    if (student === null)
-    {
+    if (student === null) {
       // ису шлём только новенькому, старому менять нельзя
       values.isuId = Number(data.get('isuId'))
     }
