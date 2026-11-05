@@ -10,6 +10,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.orm.jpa.vendor.EclipseLinkJpaDialect;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -24,14 +27,13 @@ public class JpaConfig {
         factory.setDataSource(dataSource);
         factory.setPackagesToScan("itmo.web.students.student", "itmo.web.students.user", "itmo.web.students.auth");
         factory.setJpaVendorAdapter(new EclipseLinkJpaVendorAdapter());
-        factory.setJpaDialect(new org.springframework.orm.jpa.vendor.EclipseLinkJpaDialect() {
+        factory.setJpaDialect(new EclipseLinkJpaDialect() {
             @Override
-            public org.springframework.dao.DataAccessException translateExceptionIfPossible(RuntimeException ex) {
+            public DataAccessException translateExceptionIfPossible(RuntimeException ex) {
                 Throwable cause = ex;
                 while (cause != null) {
                     if (cause instanceof java.sql.SQLException sql) {
-                        var translated = new org.springframework.jdbc.support.SQLStateSQLExceptionTranslator()
-                                .translate("JPA operation", null, sql);
+                        var translated = new SQLStateSQLExceptionTranslator().translate("JPA operation", null, sql);
                         if (translated != null) return translated;
                     }
                     cause = cause.getCause();
