@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 
 import { getErrorMessage } from '../api/httpClient.js'
 import { register } from '../api/authApi.js'
