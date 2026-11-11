@@ -6,8 +6,7 @@ import { useAuth } from '../auth/AuthContext.js'
 import StudentFilters from '../components/StudentFilters.jsx'
 import useStudentList from '../hooks/useStudentList.js'
 
-export default function StudentsPage() 
-{
+export default function StudentsPage() {
   const { authFetch, user } = useAuth()
 
   const [sortBy, setSortBy] = useState('isuId')
@@ -17,8 +16,7 @@ export default function StudentsPage()
   const [filters, setFilters] = useState({})
   const [reloadKey, setReloadKey] = useState(0)
 
-  const query = useMemo(() => 
-  {
+  const query = useMemo(() => {
     return { ...filters, fullName, sortBy, order, page, reloadKey }
   }, [filters, fullName, sortBy, order, page, reloadKey])
 
@@ -38,14 +36,12 @@ export default function StudentsPage()
     setFullName(name)
   }
 
-  function handleNameChange(value) 
-  {
+  function handleNameChange(value) {
     setFullName(value)
     setPage(1) // поиск новый и первая страница
   }
 
-  function handleApply(nextFilters) 
-  {
+  function handleApply(nextFilters) {
     setFilters(nextFilters)
     setPage(1)
   }
@@ -64,8 +60,7 @@ export default function StudentsPage()
 
   let createLink = null
 
-  if (user?.role === 'ADMIN') 
-  {
+  if (user?.role === 'ADMIN') {
     createLink = <Link to="/students/new">создать студента</Link>
   }
 
@@ -89,8 +84,9 @@ export default function StudentsPage()
           <Form onSubmit={handleSearch} className="mb-3">
             <InputGroup>
               <Form.Control name="fullName" type="search" maxLength={100}
+                pattern="[A-Za-zА-Яа-яЁё]+([\\-A-Za-zА-Яа-яЁё]+)*([A-Za-zА-Яа-яЁё]+([\\-A-Za-zА-Яа-яЁё]+)*)*"
                 placeholder="Поиск по ФИО" aria-label="ФИО студента"
-                value={fullName} onChange={(event) => handleNameChange(event.target.value)} />
+                value={fullName} onChange={(event) => event.currentTarget.form.requestSubmit()} />
               <Button type="submit">Найти</Button>
             </InputGroup>
           </Form>
