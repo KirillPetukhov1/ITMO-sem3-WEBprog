@@ -54,28 +54,51 @@ export default function RegisterPage()
     }
   }
 
-  return (
+    return (
     <main>
-      <h1>регистрация</h1>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <label htmlFor="emailField"> email</label>
-        <input id="emailField" name="email" type="email" required maxLength={254} />
+      <Row className="justify-content-center">
+        <Col md={6} lg={4}>
+          <Card>
+            <Card.Body>
+              <Card.Title as="h1" className="h3">Регистрация</Card.Title>
+              <Card.Subtitle className="mb-4 text-muted">создай аккаунт</Card.Subtitle>
 
-        <label htmlFor="usernameField"> username</label>
-        <input id="usernameField" name="username" type="text" required
-          minLength={3} maxLength={50} pattern="[A-Za-z0-9_.-]{3,50}"
-          title="логин: 3–50 символов, латиница, цифры и ._-" />
+              {message && <Alert variant={isError ? 'danger' : 'success'}>{message}</Alert>}
 
-        <label htmlFor="passwordField"> password</label>
-        <input id="passwordField" name="password" type="password" required
-          minLength={8} maxLength={72} />
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="emailField">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control name="email" type="email" required maxLength={254}
+                    autoComplete="email" />
+                </Form.Group>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'регистрируем...' : 'зарегистрироваться'}
-        </Button>
-      </form>
-      <p role={isError ? 'alert' : 'status'} hidden={message === ''}>{message}</p>
-      <Link to="/login">войти</Link>
+                <Form.Group className="mb-3" controlId="usernameField">
+                  <Form.Label>Логин</Form.Label>
+                  <Form.Control name="username" type="text" required
+                    minLength={3} maxLength={50} pattern="[A-Za-z0-9_.-]{3,50}"
+                    autoComplete="username" />
+                  <Form.Text className="text-muted">3–50 символов: латиница, цифры и . _ -</Form.Text>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="passwordField">
+                  <Form.Label>Пароль</Form.Label>
+                  <Form.Control name="password" type="password" required
+                    minLength={8} maxLength={72} autoComplete="new-password" />
+                </Form.Group>
+
+                <Button type="submit" className="w-100" disabled={isSubmitting}>
+                  {isSubmitting && <Spinner animation="border" size="sm" className="me-2" />}
+                  {isSubmitting ? 'Регистрируем...' : 'Зарегистрироваться'}
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+
+          <p className="text-center mt-3">
+            Уже есть аккаунт? <Link to="/login">Войти</Link>
+          </p>
+        </Col>
+      </Row>
     </main>
   )
 }
