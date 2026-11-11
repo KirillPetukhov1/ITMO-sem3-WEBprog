@@ -7,8 +7,7 @@ import { getErrorMessage } from '../api/httpClient.js'
 import { getStudent, updateStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function EditStudentPage()
-{
+export default function EditStudentPage() {
   const { isuId } = useParams()
   const { authFetch } = useAuth()
   const navigate = useNavigate()
@@ -17,8 +16,7 @@ export default function EditStudentPage()
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     const controller = new AbortController()
 
     getStudent(isuId, authFetch, controller.signal)
@@ -30,27 +28,22 @@ export default function EditStudentPage()
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleSave(values)
-  {
-    if (submitting)
-    {
+  async function handleSave(values) {
+    if (submitting) {
       return
     }
 
     setMessage('')
     setSubmitting(true)
 
-    try
-    {
+    try {
       await updateStudent(isuId, values, authFetch)
       navigate('/students/' + isuId, { replace: true })
     }
-    catch (error)
-    {
+    catch (error) {
       setMessage(getErrorMessage(error))
     }
-    finally
-    {
+    finally {
       setSubmitting(false)
     }
   }
@@ -58,7 +51,7 @@ export default function EditStudentPage()
   return (
     <main>
       <Button as={Link} to={'/students/' + isuId} variant="outline-secondary" size="sm" className="mb-3">
-        ← К студенту
+        К студенту
       </Button>
 
       <Card>

@@ -14,8 +14,7 @@ export default function StudentFilters({ onNameChange, onApply }) {
     onApply(filters)
   }
 
-  function handleReset(event) 
-  {
+  function handleReset(event) {
     // чистим и форму и фильтры
     event.currentTarget.form.reset()
     onNameChange('')

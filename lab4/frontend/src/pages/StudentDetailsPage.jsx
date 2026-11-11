@@ -6,8 +6,7 @@ import { useAuth } from '../auth/AuthContext.js'
 import { getErrorMessage } from '../api/httpClient.js'
 import { getStudent, deleteStudent } from '../api/studentsApi.js'
 
-function Field({ label, children }) 
-{
+function Field({ label, children }) {
   return (
     <ListGroup.Item className="d-flex justify-content-between">
       <span className="text-muted">{label}</span>
@@ -16,8 +15,7 @@ function Field({ label, children })
   )
 }
 
-export default function StudentDetailsPage() 
-{
+export default function StudentDetailsPage() {
   const { isuId } = useParams()
   const { authFetch, user } = useAuth()
   const navigate = useNavigate()
@@ -28,27 +26,22 @@ export default function StudentDetailsPage()
   const [deleteMessage, setDeleteMessage] = useState('')
   const [showConfirm, setShowConfirm] = useState(false)
 
-  useEffect(() => 
-  {
+  useEffect(() => {
     const controller = new AbortController()
 
     async function loadStudent() {
-      try 
-      {
+      try {
         const result = await getStudent(isuId, authFetch, controller.signal)
 
-        if (controller.signal.aborted) 
-        {
+        if (controller.signal.aborted) {
           return
         }
 
         setStudent(result)
         setMessage('')
       }
-      catch (error) 
-      {
-        if (error.name !== 'AbortError') 
-        {
+      catch (error) {
+        if (error.name !== 'AbortError') {
           setMessage(getErrorMessage(error))
         }
       }
@@ -58,36 +51,29 @@ export default function StudentDetailsPage()
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleDelete() 
-  {
-    if (deleting) 
-    {
+  async function handleDelete() {
+    if (deleting) {
       return
     }
 
     setDeleteMessage('')
     setDeleting(true)
 
-    try 
-    {
+    try {
       await deleteStudent(isuId, authFetch)
 
       navigate('/students', { replace: true })
     }
-    catch (error) 
-    {
+    catch (error) {
       if (error.name !== 'AbortError') setDeleteMessage(getErrorMessage(error))
     }
-    finally 
-    {
+    finally {
       setDeleting(false)
     }
   }
 
-  function closeConfirm() 
-  {
-    if (!deleting) 
-    {
+  function closeConfirm() {
+    if (!deleting) {
       setShowConfirm(false)
       setDeleteMessage('')
     }

@@ -4,42 +4,35 @@ import { Alert, Badge, Button, Card, Col, ListGroup, Row, Spinner, Stack } from 
 
 import { useAuth } from '../auth/AuthContext.js'
 
-export default function ProfilePage() 
-{
+export default function ProfilePage() {
   const { user, userMessage, signOut } = useAuth()
   const navigate = useNavigate()
   const [errorMessage, setErrorMessage] = useState('')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
-  async function handleLogout() 
-  {
-    if (isLoggingOut) 
-    {
+  async function handleLogout() {
+    if (isLoggingOut) {
       return
     }
 
     setErrorMessage('')
     setIsLoggingOut(true)
 
-    try 
-    {
+    try {
       await signOut()
       navigate('/login', { replace: true })
     }
-    catch 
-    {
+    catch {
       setErrorMessage('выход не вышел, ты тут навечно...')
     }
-    finally 
-    {
+    finally {
       setIsLoggingOut(false)
     }
   }
 
   let profile = null
 
-  if (user !== null) 
-  {
+  if (user !== null) {
     profile = (
       <ListGroup variant="flush">
         <ListGroup.Item className="d-flex justify-content-between">
@@ -52,8 +45,8 @@ export default function ProfilePage()
         </ListGroup.Item>
       </ListGroup>
     )
-    }
-  
+  }
+
 
   return (
     <main>
