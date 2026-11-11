@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
 
-import Button from "../components/Button.jsx"
 import { useAuth } from '../auth/AuthContext.js'
 import { getErrorMessage } from '../api/httpClient.js'
 import { login } from '../api/authApi.js'
@@ -33,11 +33,10 @@ export default function LoginPage()
     try 
     {
       const session = await login({ username, password })
-      // токен в память, сами идём в профиль
       setTokens(session)
       navigate('/profile', { replace: true })
     }
-    catch 
+    catch (error)
     {
       setErrorMessage(getErrorMessage(error))
     }
@@ -49,25 +48,40 @@ export default function LoginPage()
 
   return (
     <main>
-      <header>
-        <h1>вход в систему</h1>
-        <span>система управления студентами била ГЕЙтса</span>
-      </header>
+      <Row className="justify-content-center">
+        <Col md={6} lg={4}>
+          <Card>
+            <Card.Body>
+              <Card.Title as="h1" className="h3">Вход</Card.Title>
+              <Card.Subtitle className="mb-4 text-muted">система управления разумом</Card.Subtitle>
+              
+              {sessionMessage && <Alert variant="warning">{sessionMessage}</Alert>}
+              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+                            
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="usernameField">
+                  <Form.Label>Логин</Form.Label>
+                  <Form.Control name="username" type="text" required autoComplete="username" />
+                </Form.Group>
 
-      <form onSubmit={handleSubmit} className="auth-form">
-        <label htmlFor="usernameField"> username</label>
-        <input id="usernameField" name="username" type="text" required />
+                <Form.Group className="mb-3" controlId="passwordField">
+                  <Form.Label>Пароль</Form.Label>
+                  <Form.Control name="password" type="password" required autoComplete="current-password" />
+                </Form.Group>
 
-        <label htmlFor="passwordField"> password</label>
-        <input id="passwordField" name="password" type="password" required />
-        <Button type="submit" disabled={isSubmitting || restoring}>
-          {isSubmitting ? 'заходим...' : 'войти'}
-        </Button>
-      </form>
-      <p role="alert" hidden={errorMessage === ''}> {/* вывод ошибки под форммаи*/}
-        {errorMessage}
-      </p>
-      <p role="status" hidden={sessionMessage === ''}>{sessionMessage}</p>
+                <Button type="submit" className="w-100" disabled={isSubmitting || restoring}>
+                  {isSubmitting && <Spinner animation="border" size="sm" className="me-2" />}
+                  {isSubmitting ? 'Заходим...' : 'Войти'}
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+
+          <p className="text-center mt-3">
+            Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
+          </p>
+        </Col>
+      </Row>
     </main>
   )
 }

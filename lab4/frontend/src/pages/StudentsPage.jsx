@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Alert, Button, Col, Form, InputGroup, Pagination, Row, Spinner, Stack, Table } from 'react-bootstrap'
 
 import { useAuth } from '../auth/AuthContext.js'
 import StudentFilters from '../components/StudentFilters.jsx'
@@ -70,69 +71,118 @@ export default function StudentsPage()
 
   return (
     <main>
-      <h1>студенткиХХХ</h1>
-      {createLink}
+      <Stack direction="horizontal" className="mb-3">
+        <h1 className="h3 mb-0">Студенты</h1>
+        {user?.role === 'ADMIN' && (
+          <Button as={Link} to="/students/new" variant="success" className="ms-auto">
+            + Создать студента
+          </Button>
+        )}
+      </Stack>
 
-      <p role={error === '' ? 'status' : 'alert'} hidden={message === ''}>
-        {message}
-      </p>
-      {error && <button type="button" onClick={() => setReloadKey((value) => value + 1)}>
-        Повторить загрузку
-      </button>}
+      <Row className="g-4">
+        <Col lg={3}>
+          <StudentFilters onNameChange={handleNameChange} onApply={handleApply} />
+        </Col>
 
-      <form onSubmit={handleSearch}>
-        <label htmlFor="fullNameField">фио студента</label>
-        <input id="fullNameField" name="fullName" type="search" maxLength={100}
-          value={fullName} onChange={(event) => handleNameChange(event.target.value)} />
-        <button type="submit">найти</button>
-      </form>
+        <Col lg={9}>
+          <Form onSubmit={handleSearch} className="mb-3">
+            <InputGroup>
+              <Form.Control name="fullName" type="search" maxLength={100}
+                placeholder="Поиск по ФИО" aria-label="ФИО студента"
+                value={fullName} onChange={(event) => handleNameChange(event.target.value)} />
+              <Button type="submit">Найти</Button>
+            </InputGroup>
+          </Form>
 
-      <StudentFilters onNameChange={handleNameChange} onApply={handleApply} />
+          <Row className="g-2 mb-3">
+            <Col sm={6}>
+              <Form.Group controlId="sortField">
+                <Form.Label className="small text-muted mb-1">Сортировать по</Form.Label>
+                <Form.Select size="sm" value={sortBy} onChange={handleSortBy}>
+                  <option value="isuId">номер ИСУ</option>
+                  <option value="fullName">ФИО</option>
+                  <option value="group">группа</option>
+                  <option value="dormitory">общага</option>
+                  <option value="room">комната</option>
+                  <option value="settlementDate">дата заселения</option>
+                  <option value="isForeigner">иностранец</option>
+                  <option value="notes">примечания</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col sm={6}>
+              <Form.Group controlId="orderField">
+                <Form.Label className="small text-muted mb-1">Порядок</Form.Label>
+                <Form.Select size="sm" value={order} onChange={handleOrder}>
+                  <option value="asc">по возрастанию</option>
+                  <option value="desc">по убыванию</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
 
-      <div className="sort-row">
-        <label htmlFor="sortField">сортировать по</label>
-        <select id="sortField" value={sortBy} onChange={handleSortBy}>
-          <option value="isuId">номер ису</option>
-          <option value="fullName">фио</option>
-          <option value="group">группа</option>
-          <option value="dormitory">общага</option>
-          <option value="room">комната</option>
-          <option value="settlementDate">дата заселения</option>
-          <option value="isForeigner">иностранец</option>
-          <option value="notes">примечания</option>
-        </select>
+          {loading && (
+            <div className="text-center my-4">
+              <Spinner animation="border" />
+            </div>
+          )}
 
-        <label htmlFor="orderField">аорядок</label>
-        <select id="orderField" value={order} onChange={handleOrder}>
-          <option value="asc">по возрастанию</option>
-          <option value="desc">по убыванию</option>
-        </select>
-      </div>
+          {error && (
+            <Alert variant="danger" className="d-flex align-items-center">
+              {error}
+              <Button variant="outline-danger" size="sm" className="ms-auto"
+                onClick={() => setReloadKey((value) => value + 1)}>
+                Повторить
+              </Button>
+            </Alert>
+          )}
 
-      <p hidden={loading || error !== '' || data === null}>нашлось: {data?.count || 0}</p>
-      <p hidden={loading || error !== '' || data === null || students.length !== 0}>никого не нашлось</p>
+          {data !== null && (
+            <>
+              <p className="text-muted small mb-2">Найдено: {data.count}</p>
 
-      <ul>
-        {students.map((student) => 
-        {
-          return (
-            <li key={student.isuId}>
-              <Link to={'/students/' + student.isuId}>
-                {student.fullName}
-              </Link>
-              {' — ' + student.group}
-            </li>
-          )
-        })}
-      </ul>
+              <Table striped hover responsive>
+                <thead>
+                  <tr>
+                    <th>ИСУ</th>
+                    <th>ФИО</th>
+                    <th>Группа</th>
+                    <th>Общага</th>
+                    <th>Комната</th>
+                    <th>Заселён</th>
+                    <th>Иностранец</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="text-center text-muted">Никого не нашлось</td>
+                    </tr>
+                  )}
+                  {students.map((student) => (
+                    <tr key={student.isuId}>
+                      <td>{student.isuId}</td>
+                      <td><Link to={'/students/' + student.isuId}>{student.fullName}</Link></td>
+                      <td>{student.group}</td>
+                      <td>{student.dormitory}</td>
+                      <td>{student.room}</td>
+                      <td>{student.settlementDate}</td>
+                      <td>{student.isForeigner ? 'да' : 'нет'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
 
-      <div className="actions">
-        <button type="button" disabled={loading || page === 1}
-          onClick={() => setPage(page - 1)}>назад</button>
-        <span>страница {page} из {totalPages}</span>
-        <button type="button" disabled={loading || page >= totalPages}
-          onClick={() => setPage(page + 1)}>вперёд</button>
-      </div>
+              <Pagination className="justify-content-center">
+                <Pagination.Prev disabled={page === 1} onClick={() => setPage(page - 1)} />
+                <Pagination.Item active>{page} из {totalPages}</Pagination.Item>
+                <Pagination.Next disabled={page >= totalPages} onClick={() => setPage(page + 1)} />
+              </Pagination>
+            </>
+          )}
+        </Col>
+      </Row>
     </main>
   )
 }

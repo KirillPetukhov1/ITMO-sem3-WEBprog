@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Alert, Badge, Button, Card, Col, ListGroup, Row, Spinner, Stack } from 'react-bootstrap'
 
 import { useAuth } from '../auth/AuthContext.js'
 
@@ -36,36 +37,64 @@ export default function ProfilePage()
   }
 
   let profile = null
-  let roleInfo = null
 
   if (user !== null) 
   {
     profile = (
-      <dl>
-        <dt>логин</dt><dd>{user.username}</dd>
-        <dt>email</dt><dd>{user.email}</dd>
-        <dt>роль</dt><dd>{user.role}</dd>
-      </dl>
+      <ListGroup variant="flush">
+        <ListGroup.Item className="d-flex justify-content-between">
+          <span className="text-muted">Логин</span>
+          <span>{user.username}</span>
+        </ListGroup.Item>
+        <ListGroup.Item className="d-flex justify-content-between">
+          <span className="text-muted">Роль</span>
+          <Badge bg={user.role === 'ADMIN' ? 'danger' : 'secondary'}>{user.role}</Badge>
+        </ListGroup.Item>
+      </ListGroup>
     )
-
-    if (user.role !== 'ADMIN') 
-    {
-      roleInfo = <p>только смотреть, руками не трогать</p>
     }
-  }
+  
 
   return (
     <main>
-      <h1>профиль</h1>
-      <p hidden={user !== null || userMessage !== ''}>грузим профиль...</p>
-      <p role="alert" hidden={userMessage === ''}>{userMessage}</p>
-      {profile}
-      {roleInfo}
-      <Link to="/students">открыть студентов</Link>
-      <button type="button" onClick={handleLogout} disabled={isLoggingOut}>
-        {isLoggingOut ? 'выход...' : 'выйти'}
-      </button>
-      <p role="alert" hidden={errorMessage === ''}>{errorMessage}</p>
+      <Row className="justify-content-center">
+        <Col md={8} lg={6}>
+          <Card>
+            <Card.Header as="h1" className="h4">Профиль</Card.Header>
+
+            {user === null && userMessage === '' && (
+              <Card.Body>
+                <Spinner animation="border" size="sm" className="me-2" />
+                грузим профиль...
+              </Card.Body>
+            )}
+
+            {userMessage && (
+              <Card.Body>
+                <Alert variant="danger" className="mb-0">{userMessage}</Alert>
+              </Card.Body>
+            )}
+
+            {profile}
+
+            <Card.Body>
+              {user !== null && user.role !== 'ADMIN' && (
+                <Alert variant="info">доступ только на просмотр</Alert>
+              )}
+              {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+
+              <Stack direction="horizontal" gap={2}>
+                <Button as={Link} to="/students">открыть данные студентов</Button>
+                <Button variant="outline-danger" className="ms-auto"
+                  onClick={handleLogout} disabled={isLoggingOut}>
+                  {isLoggingOut && <Spinner animation="border" size="sm" className="me-2" />}
+                  {isLoggingOut ? 'Выходим...' : 'Выйти'}
+                </Button>
+              </Stack>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </main>
   )
 }

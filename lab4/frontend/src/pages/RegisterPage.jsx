@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import { getErrorMessage } from '../api/httpClient.js'
 import { register } from '../api/authApi.js'
-import Button from "../components/Button"
+
 
 export default function RegisterPage() 
 {

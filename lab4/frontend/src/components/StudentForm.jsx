@@ -1,75 +1,86 @@
-export default function StudentForm({ student = null, onSubmit, submitting, buttonText }) {
-  function handleSubmit(event) 
+import { Button, Form } from 'react-bootstrap'
+
+export default function StudentForm({ student = null, onSubmit, submitting, buttonText })
+{
+  function handleSubmit(event)
   {
     event.preventDefault()
 
     const data = new FormData(event.currentTarget)
-    // собираем поля, потом пакуем в post или patch
-    const values = 
-    {
-      fullName: String(data.get('fullName')).trim(),
-      group: String(data.get('group')).trim(),
+
+    const values = {
+      fullName: data.get('fullName').trim(),
+      group: data.get('group').trim(),
       dormitory: Number(data.get('dormitory')),
       room: Number(data.get('room')),
-      settlementDate: String(data.get('settlementDate')),
+      settlementDate: data.get('settlementDate'),
       isForeigner: data.get('isForeigner') === 'true',
-      notes: String(data.get('notes')).trim()
+      notes: data.get('notes').trim()
     }
 
-    if (student === null) 
+    if (student === null)
     {
-      // ису шлём только новенькому, старому менять нельзя
       values.isuId = Number(data.get('isuId'))
     }
 
-    const nameField = event.currentTarget.elements.namedItem('fullName')
-    nameField.setCustomValidity(values.fullName.length < 5 || values.fullName.length > 100
-      ? 'ФИО должно содержать от 5 до 100 символов без пробелов по краям' : '')
-    if (!event.currentTarget.reportValidity()) return
     onSubmit(values)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="student-form"
-      onInput={(event) => event.target.setCustomValidity?.('')}>
-      <label htmlFor="isuField">номер ису</label>
-      <input id="isuField" name="isuId" type="number" min="100000" max="999999"
-        defaultValue={student?.isuId || ''} disabled={student !== null} required />
+    <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3" controlId="isuField">
+        <Form.Label>Номер ИСУ</Form.Label>
+        <Form.Control name="isuId" type="number" min="100000" max="999999" required
+          defaultValue={student?.isuId} disabled={student !== null} />
+      </Form.Group>
 
-      <label htmlFor="nameField">фио</label>
-      <input id="nameField" name="fullName" type="text" minLength={5} maxLength={100}
-        defaultValue={student?.fullName || ''} required />
+      <Form.Group className="mb-3" controlId="nameField">
+        <Form.Label>ФИО</Form.Label>
+        <Form.Control name="fullName" minLength={5} maxLength={100} required
+          defaultValue={student?.fullName} />
+      </Form.Group>
 
-      <label htmlFor="groupField">группа</label>
-      <input id="groupField" name="group" type="text" pattern="[A-Z][0-9]{4}"
-        title="большая латинская буква и 4 цифры, типа A1234" defaultValue={student?.group || ''} required />
+      <Form.Group className="mb-3" controlId="groupField">
+        <Form.Label>Группа</Form.Label>
+        <Form.Control name="group" pattern="[A-Z][0-9]{4}" placeholder="A1234" required
+          title="большая латинская буква и 4 цифры" defaultValue={student?.group} />
+      </Form.Group>
 
-      <label htmlFor="dormitoryField">общага</label>
-      <input id="dormitoryField" name="dormitory" type="number" min="1" max="99"
-        defaultValue={student?.dormitory || ''} required />
+      <Form.Group className="mb-3" controlId="dormitoryField">
+        <Form.Label>Общага</Form.Label>
+        <Form.Control name="dormitory" type="number" min="1" max="99" required
+          defaultValue={student?.dormitory} />
+      </Form.Group>
 
-      <label htmlFor="roomField">комната</label>
-      <input id="roomField" name="room" type="number" min="1" max="9999"
-        defaultValue={student?.room || ''} required />
+      <Form.Group className="mb-3" controlId="roomField">
+        <Form.Label>Комната</Form.Label>
+        <Form.Control name="room" type="number" min="1" max="9999" required
+          defaultValue={student?.room} />
+      </Form.Group>
 
-      <label htmlFor="dateField">дата заселения</label>
-      <input id="dateField" name="settlementDate" type="date" min="2000-01-01"
-        defaultValue={student?.settlementDate || ''} required />
+      <Form.Group className="mb-3" controlId="dateField">
+        <Form.Label>Дата заселения</Form.Label>
+        <Form.Control name="settlementDate" type="date" min="2000-01-01" required
+          defaultValue={student?.settlementDate} />
+      </Form.Group>
 
-      <label htmlFor="foreignerField">иностранец</label>
-      <select id="foreignerField" name="isForeigner"
-        defaultValue={String(student?.isForeigner ?? false)}>
-        <option value="false">нет</option>
-        <option value="true">да</option>
-      </select>
+      <Form.Group className="mb-3" controlId="foreignerField">
+        <Form.Label>Иностранец</Form.Label>
+        <Form.Select name="isForeigner" defaultValue={String(student?.isForeigner ?? false)}>
+          <option value="false">нет</option>
+          <option value="true">да</option>
+        </Form.Select>
+      </Form.Group>
 
-      <label htmlFor="notesField">примечания</label>
-      <textarea id="notesField" name="notes" maxLength={500}
-        defaultValue={student?.notes || ''} />
+      <Form.Group className="mb-3" controlId="notesField">
+        <Form.Label>Примечания</Form.Label>
+        <Form.Control as="textarea" rows={3} name="notes" maxLength={500}
+          defaultValue={student?.notes} />
+      </Form.Group>
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'сохраняем...' : buttonText}
-      </button>
-    </form>
+      <Button type="submit" disabled={submitting}>
+        {submitting ? 'Сохраняем...' : buttonText}
+      </Button>
+    </Form>
   )
 }

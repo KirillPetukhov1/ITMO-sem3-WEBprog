@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import { Badge, Container, Nav, Navbar } from 'react-bootstrap'
 
 import { useAuth } from '../auth/AuthContext.js'
 
@@ -13,10 +14,12 @@ export default function Navigation()
 
   let links = (
     <>
-      <NavLink to="/login">вход</NavLink>
-      <NavLink to="/register">регистрация</NavLink>
+      <Nav.Link as={NavLink} to="/login">вход</Nav.Link>
+      <Nav.Link as={NavLink} to="/register">регистрация</Nav.Link>
     </>
   )
+
+  let userInfo = null
 
   if (tokens !== null) 
   {
@@ -24,18 +27,38 @@ export default function Navigation()
 
     if (user?.role === 'ADMIN') 
     {
-      adminLink = <NavLink to="/students/new">создать студента</NavLink>
+      adminLink = <Nav.Link as={NavLink} to="/students/new">создать студента</Nav.Link>
     }
 
-    links = 
-    (
+    links = (
       <>
-        <NavLink to="/students" end>студенты</NavLink>
+        <Nav.Link as={NavLink} to="/students" end>студенты</Nav.Link>
         {adminLink}
-        <NavLink to="/profile">профиль</NavLink>
+        <Nav.Link as={NavLink} to="/profile">профиль</Nav.Link>
       </>
     )
   }
 
-  return <nav className="tabs" aria-label="вкладки">{links}</nav>
+  if (user !== null) 
+  {
+      userInfo = (
+        <Navbar.Text>
+          {user.username}{' '}
+          <Badge bg={user.role === 'ADMIN' ? 'danger' : 'secondary'}>{user.role}</Badge>
+        </Navbar.Text>
+      )
+  }
+
+    return (
+    <Navbar bg="dark" data-bs-theme="dark" expand="md" className="mb-4">
+      <Container>
+        <Navbar.Brand as={Link} to="/students">Студенты</Navbar.Brand>
+        <Navbar.Toggle aria-controls="main-nav" />
+        <Navbar.Collapse id="main-nav">
+          <Nav className="me-auto">{links}</Nav>
+          {userInfo}
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  )
 }

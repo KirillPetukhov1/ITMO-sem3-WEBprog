@@ -1,55 +1,38 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Alert, Button, Card, Spinner } from 'react-bootstrap'
 
 import { useAuth } from '../auth/AuthContext.js'
 import { getErrorMessage } from '../api/httpClient.js'
 import { getStudent, updateStudent } from '../api/studentsApi.js'
 import StudentForm from '../components/StudentForm.jsx'
 
-export default function EditStudentPage() 
+export default function EditStudentPage()
 {
   const { isuId } = useParams()
   const { authFetch } = useAuth()
   const navigate = useNavigate()
 
   const [student, setStudent] = useState(null)
-  const [message, setMessage] = useState('грузим...')
+  const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => 
-    {
+  useEffect(() =>
+  {
     const controller = new AbortController()
 
-    async function loadStudent() {
-      try 
-      {
-        const result = await getStudent(isuId, authFetch, controller.signal)
+    getStudent(isuId, authFetch, controller.signal)
+      .then((result) => setStudent(result))
+      .catch((error) => {
+        if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
+      })
 
-        if (controller.signal.aborted) 
-        {
-          return
-        }
-
-        setStudent(result)
-        setMessage('')
-      }
-      catch (error) 
-      {
-        if (error.name !== 'AbortError') 
-        {
-          if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
-        }
-      }
-    }
-
-    loadStudent()
     return () => controller.abort()
   }, [isuId, authFetch])
 
-  async function handleSave(values) 
+  async function handleSave(values)
   {
-    // ису сюда не тащим
-    if (submitting) 
+    if (submitting)
     {
       return
     }
@@ -57,35 +40,38 @@ export default function EditStudentPage()
     setMessage('')
     setSubmitting(true)
 
-    try 
+    try
     {
-      const updated = await updateStudent(isuId, values, authFetch)
-      navigate('/students/' + updated.isuId, { replace: true })
+      await updateStudent(isuId, values, authFetch)
+      navigate('/students/' + isuId, { replace: true })
     }
-    catch 
+    catch (error)
     {
-      if (error.name !== 'AbortError') setMessage(getErrorMessage(error))
+      setMessage(getErrorMessage(error))
     }
-    finally 
+    finally
     {
       setSubmitting(false)
     }
   }
 
-  let form = null
-
-  if (student !== null) 
-  {
-    form = <StudentForm student={student} onSubmit={handleSave}
-      submitting={submitting} buttonText="сохранить" />
-  }
-
   return (
     <main>
-      <Link to={'/students/' + isuId}>к студенту</Link>
-      <h1>изменить студента</h1>
-      {form}
-      <p role="status" hidden={message === ''}>{message}</p>
+      <Button as={Link} to={'/students/' + isuId} variant="outline-secondary" size="sm" className="mb-3">
+        ← К студенту
+      </Button>
+
+      <Card>
+        <Card.Header as="h1" className="h4">Изменить студента</Card.Header>
+        <Card.Body>
+          {student === null && message === '' && <Spinner animation="border" />}
+          {message && <Alert variant="danger">{message}</Alert>}
+          {student !== null && (
+            <StudentForm student={student} onSubmit={handleSave}
+              submitting={submitting} buttonText="Сохранить" />
+          )}
+        </Card.Body>
+      </Card>
     </main>
   )
 }

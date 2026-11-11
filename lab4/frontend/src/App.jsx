@@ -6,6 +6,8 @@ import {
   useParams
 } from 'react-router-dom'
 
+import { Container } from 'react-bootstrap'
+
 import LoginPage from './pages/LoginPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
@@ -34,33 +36,35 @@ export default function App()
   return (
     <BrowserRouter>
       <Navigation />
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path='/register' element={<RegisterPage />} />
-        <Route
-          path="/profile"
-          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
-        />
+        <Container className="pb-4">
+          <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+          <Route
+            path="/profile"
+            element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+          />
 
-        <Route
-          path="/students"
-          element={<ProtectedRoute><StudentsPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/students/new"
-          element={<ProtectedRoute adminOnly><CreateStudentPage /></ProtectedRoute>}
-        />
-        <Route
-          path="/students/:isuId"
-          element={<ProtectedRoute><StudentRoute /></ProtectedRoute>}
-        />
-        <Route
-          path="/students/:isuId/edit"
-          element={<ProtectedRoute adminOnly><StudentRoute edit /></ProtectedRoute>}
-        />
-        <Route path="*" element={<main><h1>страница куда-то делась</h1></main>} />
-      </Routes>
+          <Route
+            path="/students"
+            element={<ProtectedRoute><StudentsPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/students/new"
+            element={<ProtectedRoute adminOnly><CreateStudentPage /></ProtectedRoute>}
+          />
+          <Route
+            path="/students/:isuId"
+            element={<ProtectedRoute><StudentRoute /></ProtectedRoute>}
+          />
+          <Route
+            path="/students/:isuId/edit"
+            element={<ProtectedRoute adminOnly><StudentRoute edit /></ProtectedRoute>}
+          />
+          <Route path="*" element={<main><h1>страница куда-то делась</h1></main>} />
+        </Routes>
+      </Container>
     </BrowserRouter>
   )
 }

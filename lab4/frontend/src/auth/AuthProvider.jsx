@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { createAuthFetch, getErrorMessage } from '../api/httpClient.js'
 import { refreshSession, logout, getCurrentUser } from '../api/authApi.js'
@@ -29,14 +29,13 @@ export function AuthProvider({ children }) {
   }, [])
 
   const refresh = useCallback(() => {
-    // обновлялка уже идёт, вторую не плодим
     if (refreshingRef.current !== null) {
       return refreshingRef.current
     }
 
     const generation = generationRef.current
     const operation = (async () => {
-      const response = refreshSession()
+      const response = await refreshSession()
 
       if (generationRef.current !== generation) {
         return sessionRef.current
@@ -58,7 +57,6 @@ export function AuthProvider({ children }) {
         return sessionRef.current
       }
 
-      // токен новый, а форму и права не сносим
       setTokens(next, false)
       return next
     })().finally(() => {
