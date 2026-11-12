@@ -1,206 +1,141 @@
-import { userFromToken } from '../domain/user.js';
-import { ApiError } from '../shared/errors.js';
+import { userFromToken } from '../domain/user.js'
+import { ApiError } from '../shared/errors.js'
 
-const STORAGE_KEY = 'students.session.v1';
-const EXPIRED_MESSAGE = 'Сессия истекла. Войдите снова';
+const EXPIRED_MESSAGE = 'Сессия истекла. Войдите снова'
+const endedSession = (error) =>
+  ['NO_SESSION', 'INVALID_REFRESH_TOKEN', 'INVALID_TOKEN'].includes(error.code)
 
-function validateTokens(tokens) {
-  if (
-    !tokens?.accessToken ||
-    typeof tokens.refreshToken !== 'string' ||
-    !tokens.refreshToken ||
-    tokens.refreshToken.length > 200
-  ) {
-    throw new ApiError('Некорректная пара токенов', 0, 'INVALID_TOKEN');
-  }
-}
+export function createSessionService(store, api) {
+  let queue = Promise.resolve()
+  let refreshing = null
+  let restoration = null
+  let mutations = 0
+  let bootstrapping = false
 
-export function createSessionService(store, api, storage) {
-  let refreshing = null;
-  let restoration = null;
-  let closing = false;
-
-  function persist(tokens) {
-    try {
-      if (tokens) {
-        storage?.setItem(STORAGE_KEY, JSON.stringify(tokens));
-      } else {
-        storage?.removeItem(STORAGE_KEY);
-      }
-    } catch {}
+  function enqueue(operation) {
+    const result = queue.then(operation)
+    queue = result.catch(() => {})
+    return result
   }
 
-  function accept(tokens, newSession = true) {
-    validateTokens(tokens);
-    const user = userFromToken(tokens.accessToken);
-    store.setState((state) => {
-      let generation = state.generation;
-      if (newSession) {
-        generation += 1;
-      }
-      return {
-        tokens,
-        user,
-        userMessage: '',
-        sessionMessage: '',
-        generation,
-      };
-    });
-    persist(tokens);
+  function updateBusy() {
+    store.setState({ restoring: bootstrapping || mutations > 0 })
+  }
+
+  function accept(response, newSession = true) {
+    if (typeof response?.accessToken !== 'string' || !response.accessToken) {
+      throw new ApiError('Некорректный access-токен.', 0, 'INVALID_TOKEN')
+    }
+    const user = userFromToken(response.accessToken)
+    const tokens = {
+      accessToken: response.accessToken,
+      tokenType: response.tokenType,
+      expiresIn: response.expiresIn
+    }
+    store.setState((state) => ({
+      tokens, user, userMessage: '', sessionMessage: '',
+      generation: state.generation + (newSession ? 1 : 0)
+    }))
+    return tokens
   }
 
   function clear(message = '') {
-    persist(null);
     store.setState((state) => ({
-      tokens: null,
-      user: null,
-      sessionMessage: message,
-      generation: state.generation + 1,
-    }));
-  }
-
-  async function performRefresh(entry, refreshToken) {
-    try {
-      const tokens = await api.refresh(refreshToken);
-      if (store.getState().generation !== entry.generation) {
-        throw new DOMException('Сессия изменена', 'AbortError');
-      }
-      accept(tokens, false);
-      return tokens;
-    } catch (error) {
-      if (
-        store.getState().generation === entry.generation &&
-        ['INVALID_REFRESH_TOKEN', 'INVALID_TOKEN'].includes(error.code)
-      ) {
-        clear(EXPIRED_MESSAGE);
-      }
-      throw error;
-    } finally {
-      if (refreshing === entry) {
-        refreshing = null;
-      }
-    }
+      tokens: null, user: null, userMessage: '', sessionMessage: message,
+      generation: state.generation + 1
+    }))
   }
 
   function refresh() {
-    if (closing) {
-      return Promise.reject(new DOMException('Выход из системы', 'AbortError'));
+    if (mutations > 0) {
+      return Promise.reject(new DOMException('Сессия изменяется', 'AbortError'))
     }
-    const state = store.getState();
-    if (refreshing?.generation === state.generation) {
-      return refreshing.promise;
-    }
-    if (!state.tokens) {
-      return Promise.reject(new ApiError('Нет сессии.', 401, 'UNAUTHORIZED'));
-    }
-    const entry = {
-      generation: state.generation,
-    };
-    entry.promise = performRefresh(entry, state.tokens.refreshToken);
-    refreshing = entry;
-    return entry.promise;
-  }
-
-  function handleRestoreError(error) {
-    if (error instanceof SyntaxError || error.code === 'INVALID_TOKEN') {
-      clear('Войдите снова.');
-      return;
-    }
-    if (error.name !== 'AbortError') {
-      store.setState({
-        sessionMessage: 'Не удалось восстановить сессию. Проверьте подключение или войдите снова',
-      });
-    }
-  }
-
-  async function restoreSavedSession() {
-    try {
-      const saved = storage?.getItem(STORAGE_KEY);
-      if (saved) {
-        accept(JSON.parse(saved));
-        await refresh();
+    const generation = store.getState().generation
+    if (refreshing?.generation === generation) return refreshing.promise
+    const entry = { generation }
+    entry.promise = enqueue(async () => {
+      try {
+        if (store.getState().generation !== generation) {
+          throw new DOMException('Сессия изменена', 'AbortError')
+        }
+        const response = await api.refresh()
+        if (store.getState().generation !== generation) {
+          throw new DOMException('Сессия изменена', 'AbortError')
+        }
+        return accept(response, false)
+      } catch (error) {
+        if (store.getState().generation === generation && endedSession(error)) {
+          clear(EXPIRED_MESSAGE)
+        }
+        throw error
+      } finally {
+        if (refreshing === entry) refreshing = null
       }
-    } catch (error) {
-      handleRestoreError(error);
-    } finally {
-      store.setState({
-        restoring: false,
-      });
-    }
+    })
+    refreshing = entry
+    return entry.promise
   }
 
-  async function restore() {
+  function restore() {
     if (!restoration) {
-      restoration = restoreSavedSession();
+      bootstrapping = true
+      updateBusy()
+      restoration = refresh().catch((error) => {
+        if (endedSession(error)) {
+          store.setState({ sessionMessage: '' })
+        } else if (error.name !== 'AbortError') {
+          store.setState({
+            sessionMessage: 'Не удалось восстановить сессию. Проверьте подключение или войдите снова'
+          })
+        }
+      }).finally(() => {
+        bootstrapping = false
+        updateBusy()
+      })
     }
-    return restoration;
+    return restoration
   }
 
-  async function waitForRefresh(pending) {
-    if (!pending) {
-      return;
-    }
-    try {
-      await pending;
-    } catch {}
+  function changeSession(operation) {
+    mutations += 1
+    clear()
+    updateBusy()
+    const generation = store.getState().generation
+    return enqueue(() => operation(generation)).finally(() => {
+      mutations -= 1
+      updateBusy()
+    })
   }
 
-  function handleLogoutError(error) {
-    let sessionMessage = 'Локальный выход выполнен. Сервер не подтвердил отзыв refresh-токена';
-    if (error.code === 'INVALID_REFRESH_TOKEN') {
-      sessionMessage = '';
-    }
-    store.setState({
-      sessionMessage,
-    });
-  }
-
-  async function signOut() {
-    if (closing) {
-      return;
-    }
-    closing = true;
-    store.setState({
-      restoring: true,
-    });
-    const pending = refreshing?.promise;
-    const original = store.getState().tokens;
-
-    try {
-      await waitForRefresh(pending);
-      let token = store.getState().tokens?.refreshToken;
-      if (!token) {
-        token = original?.refreshToken;
+  function signIn(values) {
+    return changeSession(async (generation) => {
+      const response = await api.login(values)
+      if (store.getState().generation !== generation) {
+        throw new DOMException('Сессия изменена', 'AbortError')
       }
-      clear();
-      if (token) {
-        await api.logout(token);
-      }
-    } catch (error) {
-      handleLogoutError(error);
-    } finally {
-      clear(store.getState().sessionMessage);
-      closing = false;
-      store.setState({
-        restoring: false,
-      });
-    }
+      return accept(response, false)
+    })
   }
 
-  function tokens() {
-    if (closing) {
-      return null;
-    }
-    return store.getState().tokens;
+  function signOut() {
+    return changeSession(async (generation) => {
+      try {
+        await api.logout()
+      } catch (error) {
+        if (store.getState().generation === generation) {
+          store.setState({
+            sessionMessage: 'Локальный выход выполнен, но сервер не подтвердил удаление сессии. После перезагрузки вход может восстановиться'
+          })
+        }
+        throw error
+      }
+    })
   }
+
   return {
-    accept,
-    clear,
-    refresh,
-    restore,
-    signOut,
-    tokens,
+    accept, clear, refresh, restore, signIn, signOut,
+    tokens: () => mutations > 0 ? null : store.getState().tokens,
     generation: () => store.getState().generation,
-    expire: () => clear(EXPIRED_MESSAGE),
-  };
+    expire: () => clear(EXPIRED_MESSAGE)
+  }
 }

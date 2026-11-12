@@ -1,41 +1,38 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
-
-import { useAuth } from '../auth/AuthContext.js';
-import { getErrorMessage } from '../shared/errors.js';
-import { authApi } from '../app/services.js';
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
+import { useAuth } from '../auth/AuthContext.js'
+import { getErrorMessage } from '../shared/errors.js'
 
 export default function LoginPage() {
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const { setTokens, restoring, sessionMessage, setSessionMessage } = useAuth();
+  const [errorMessage, setErrorMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
+  const { signIn, signOut, restoring, sessionMessage, setSessionMessage } = useAuth()
 
   async function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     if (isSubmitting || restoring) {
-      return;
+      return
     }
-    setErrorMessage('');
-    setSessionMessage('');
-    setIsSubmitting(true);
-    const data = new FormData(event.currentTarget);
-    const username = data.get('username');
-    const password = data.get('password');
+    setErrorMessage('')
+    setSessionMessage('')
+    setIsSubmitting(true)
+    const data = new FormData(event.currentTarget)
+    const username = data.get('username')
+    const password = data.get('password')
     try {
-      const session = await authApi.login({
+      await signIn({
         username,
-        password,
-      });
-      setTokens(session);
+        password
+      })
       navigate('/profile', {
-        replace: true,
-      });
+        replace: true
+      })
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
+      setErrorMessage(getErrorMessage(error))
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
   return (
@@ -49,7 +46,14 @@ export default function LoginPage() {
               </Card.Title>
               <Card.Subtitle className="mb-4 text-muted">система управления разумом</Card.Subtitle>
 
-              {sessionMessage && <Alert variant="warning">{sessionMessage}</Alert>}
+              {sessionMessage && (
+                <Alert variant="warning">
+                  {sessionMessage}
+                  <Button variant="link" disabled={restoring} onClick={async () => {
+                    try { await signOut() } catch { /* Сообщение сохраняет сервис сессии. */ }
+                  }}>Завершить серверную сессию</Button>
+                </Alert>
+              )}
               {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
               <Form onSubmit={handleSubmit}>
@@ -82,5 +86,5 @@ export default function LoginPage() {
         </Col>
       </Row>
     </main>
-  );
+  )
 }

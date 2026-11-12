@@ -1,19 +1,17 @@
-import { useStore } from 'zustand';
-
-import { sessionStore } from '../state/sessionStore.js';
-import { session } from '../app/services.js';
-
+import { useStore } from 'zustand'
+import { sessionStore } from '../state/sessionStore.js'
+import { session } from '../app/services.js'
 const setSessionMessage = (sessionMessage) =>
   sessionStore.setState({
-    sessionMessage,
-  });
+    sessionMessage
+  })
 
 export function useAuth() {
-  const state = useStore(sessionStore);
+  const state = useStore(sessionStore)
   return {
     ...state,
-    setTokens: session.accept,
+    signIn: session.signIn,
     signOut: session.signOut,
-    setSessionMessage,
-  };
+    setSessionMessage
+  }
 }
