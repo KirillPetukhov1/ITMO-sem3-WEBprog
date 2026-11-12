@@ -39,6 +39,7 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
           name="fullName"
           minLength={5}
           maxLength={100}
+          pattern="[A-Za-zА-Яа-яЁё]+(-[A-Za-zА-Яа-яЁё]+)*( [A-Za-zА-Яа-яЁё]+(-[A-Za-zА-Яа-яЁё]+)*)*"
           required
           defaultValue={student?.fullName}
         />
