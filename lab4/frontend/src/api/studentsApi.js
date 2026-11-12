@@ -1,35 +1,42 @@
-import { requestJson } from './httpClient.js'
+import { studentDto, searchDto, studentFromDto, pageFromDto } from '../domain/student.js'
 
-export function listStudents(query, authFetch, signal) {
-  const params = new URLSearchParams()
-  for (const [name, value] of Object.entries(query)) {
-    if (value !== '' && value !== null && value !== undefined) {
-      params.set(name, String(value))
-    }
+function studentPath(id) {
+  return `/api/students/${encodeURIComponent(id)}`
+}
+
+export function createStudentsApi(request) {
+  async function list(query, signal) {
+    const parameters = searchDto(query)
+    const response = await request('/api/students', { query: parameters, signal })
+    return pageFromDto(response)
   }
-  return requestJson('/api/students?' + params, { signal }, authFetch)
-}
 
-export function getStudent(isuId, authFetch, signal) {
-  return requestJson('/api/students/' + isuId, { signal }, authFetch)
-}
+  async function query(parameters, signal) {
+    const body = searchDto(parameters)
+    const response = await request('/api/students', { method: 'QUERY', body, signal })
+    return pageFromDto(response)
+  }
 
-export function createStudent(student, authFetch) {
-  return requestJson('/api/students', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(student)
-  }, authFetch)
-}
+  async function get(id, signal) {
+    const response = await request(studentPath(id), { signal })
+    return studentFromDto(response)
+  }
 
-export function updateStudent(isuId, values, authFetch) {
-  return requestJson('/api/students/' + isuId, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(values)
-  }, authFetch)
-}
+  async function create(values) {
+    const body = studentDto(values)
+    const response = await request('/api/students', { method: 'POST', body })
+    return studentFromDto(response)
+  }
 
-export function deleteStudent(isuId, authFetch) {
-  return requestJson('/api/students/' + isuId, { method: 'DELETE' }, authFetch, false)
+  async function update(id, values) {
+    const body = studentDto(values, true)
+    const response = await request(studentPath(id), { method: 'PATCH', body })
+    return studentFromDto(response)
+  }
+
+  function remove(id) {
+    return request(studentPath(id), { method: 'DELETE' })
+  }
+
+  return { list, query, get, create, update, remove }
 }

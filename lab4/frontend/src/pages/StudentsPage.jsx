@@ -1,37 +1,66 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Alert, Button, Col, Form, InputGroup, Pagination, Row, Spinner, Stack, Table } from 'react-bootstrap'
+import {
+  Alert,
+  Button,
+  Col,
+  Form,
+  InputGroup,
+  Pagination,
+  Row,
+  Spinner,
+  Stack,
+  Table
+} from 'react-bootstrap'
 
 import { useAuth } from '../auth/AuthContext.js'
 import StudentFilters from '../components/StudentFilters.jsx'
 import useStudentList from '../hooks/useStudentList.js'
 
 export default function StudentsPage() {
-  const { authFetch, user } = useAuth()
-
+  const { user } = useAuth()
   const [sortBy, setSortBy] = useState('isuId')
   const [order, setOrder] = useState('asc')
   const [fullName, setFullName] = useState('')
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState({})
   const [reloadKey, setReloadKey] = useState(0)
-
   const query = useMemo(() => {
-    return { ...filters, fullName, sortBy, order, page, reloadKey }
+    return {
+      ...filters,
+      fullName,
+      sortBy,
+      order,
+      page,
+      reloadKey
+    }
   }, [filters, fullName, sortBy, order, page, reloadKey])
+  const { loading, data, error } = useStudentList(query)
+  // Синхронизация с исправленным сервером номером страницы после удаления
+  useEffect(() => {
+    if (data?.correctedFrom) {
+      setPage((current) => {
+        if (current === data.correctedFrom) {
+          return data.page
+        }
+        return current
+      })
+    }
+  }, [data])
+  let students = data?.results
+  if (!students) {
+    students = []
+  }
+  let totalPages = data?.total_pages
+  if (!totalPages) {
+    totalPages = 1
+  }
 
-  const { loading, data, error } = useStudentList(query, authFetch)
-  const students = data?.results || []
-  const totalPages = data?.total_pages || 1
-  const message = loading ? 'грузим...' : error //бем бем бем
-
-  function handleSearch(event) //поиск по фио
-  {
+  function handleSearch(event) {
+    //поиск по фио
     event.preventDefault()
-
     const data = new FormData(event.currentTarget)
     const name = data.get('fullName').trim()
-
     setPage(1) // на первую страницу при поиске
     setFullName(name)
   }
@@ -46,24 +75,17 @@ export default function StudentsPage() {
     setPage(1)
   }
 
-  function handleSortBy(event) //сортиров-очка
-  {
+  function handleSortBy(event) {
+    //сортиров-очка
     setSortBy(event.target.value)
     setPage(1)
   }
 
-  function handleOrder(event) //порядок сортировки
-  {
+  function handleOrder(event) {
+    //порядок сортировки
     setOrder(event.target.value)
     setPage(1)
   }
-
-  let createLink = null
-
-  if (user?.role === 'ADMIN') {
-    createLink = <Link to="/students/new">создать студента</Link>
-  }
-
   return (
     <main>
       <Stack direction="horizontal" className="mb-3">
@@ -83,10 +105,16 @@ export default function StudentsPage() {
         <Col lg={9}>
           <Form onSubmit={handleSearch} className="mb-3">
             <InputGroup>
-              <Form.Control name="fullName" type="search" maxLength={100}
-                pattern="[A-Za-zА-Яа-яЁё]+([\\-A-Za-zА-Яа-яЁё]+)*([A-Za-zА-Яа-яЁё]+([\\-A-Za-zА-Яа-яЁё]+)*)*"
-                placeholder="Поиск по ФИО" aria-label="ФИО студента"
-                value={fullName} onChange={(event) => event.currentTarget.form.requestSubmit()} />
+              <Form.Control
+                name="fullName"
+                type="search"
+                maxLength={100}
+                placeholder="Поиск по ФИО"
+                aria-label="ФИО студента"
+                pattern="[A-Za-zА-Яа-яЁё]+(-[A-Za-zА-Яа-яЁё]+)*( [A-Za-zА-Яа-яЁё]+(-[A-Za-zА-Яа-яЁё]+)*)*"
+                value={fullName}
+                onChange={(event) => event.currentTarget.form.requestSubmit()}
+              />
               <Button type="submit">Найти</Button>
             </InputGroup>
           </Form>
@@ -127,8 +155,12 @@ export default function StudentsPage() {
           {error && (
             <Alert variant="danger" className="d-flex align-items-center">
               {error}
-              <Button variant="outline-danger" size="sm" className="ms-auto"
-                onClick={() => setReloadKey((value) => value + 1)}>
+              <Button
+                variant="outline-danger"
+                size="sm"
+                className="ms-auto"
+                onClick={() => setReloadKey((value) => value + 1)}
+              >
                 Повторить
               </Button>
             </Alert>
@@ -153,13 +185,17 @@ export default function StudentsPage() {
                 <tbody>
                   {students.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="text-center text-muted">Никого не нашлось</td>
+                      <td colSpan={7} className="text-center text-muted">
+                        Никого не нашлось
+                      </td>
                     </tr>
                   )}
                   {students.map((student) => (
                     <tr key={student.isuId}>
                       <td>{student.isuId}</td>
-                      <td><Link to={'/students/' + student.isuId}>{student.fullName}</Link></td>
+                      <td>
+                        <Link to={'/students/' + student.isuId}>{student.fullName}</Link>
+                      </td>
                       <td>{student.group}</td>
                       <td>{student.dormitory}</td>
                       <td>{student.room}</td>
@@ -172,7 +208,9 @@ export default function StudentsPage() {
 
               <Pagination className="justify-content-center">
                 <Pagination.Prev disabled={page === 1} onClick={() => setPage(page - 1)} />
-                <Pagination.Item active>{page} из {totalPages}</Pagination.Item>
+                <Pagination.Item active>
+                  {page} из {totalPages}
+                </Pagination.Item>
                 <Pagination.Next disabled={page >= totalPages} onClick={() => setPage(page + 1)} />
               </Pagination>
             </>

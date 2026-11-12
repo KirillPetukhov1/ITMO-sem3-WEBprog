@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Alert, Badge, Button, Card, ListGroup, Modal, Spinner, Stack } from 'react-bootstrap'
 
+import useStudent from '../hooks/useStudent.js'
 import { useAuth } from '../auth/AuthContext.js'
-import { getErrorMessage } from '../api/httpClient.js'
-import { getStudent, deleteStudent } from '../api/studentsApi.js'
+import { getErrorMessage } from '../shared/errors.js'
+import { deleteStudent } from '../features/students/studentActions.js'
 
 function Field({ label, children }) {
   return (
@@ -17,57 +18,29 @@ function Field({ label, children }) {
 
 export default function StudentDetailsPage() {
   const { isuId } = useParams()
-  const { authFetch, user } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
-
-  const [student, setStudent] = useState(null)
-  const [message, setMessage] = useState('')
+  const { data: student, error: message } = useStudent(isuId)
   const [deleting, setDeleting] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
   const [showConfirm, setShowConfirm] = useState(false)
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function loadStudent() {
-      try {
-        const result = await getStudent(isuId, authFetch, controller.signal)
-
-        if (controller.signal.aborted) {
-          return
-        }
-
-        setStudent(result)
-        setMessage('')
-      }
-      catch (error) {
-        if (error.name !== 'AbortError') {
-          setMessage(getErrorMessage(error))
-        }
-      }
-    }
-
-    loadStudent()
-    return () => controller.abort()
-  }, [isuId, authFetch])
 
   async function handleDelete() {
     if (deleting) {
       return
     }
-
     setDeleteMessage('')
     setDeleting(true)
-
     try {
-      await deleteStudent(isuId, authFetch)
-
-      navigate('/students', { replace: true })
-    }
-    catch (error) {
-      if (error.name !== 'AbortError') setDeleteMessage(getErrorMessage(error))
-    }
-    finally {
+      await deleteStudent(isuId)
+      navigate('/students', {
+        replace: true
+      })
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        setDeleteMessage(getErrorMessage(error))
+      }
+    } finally {
       setDeleting(false)
     }
   }
@@ -78,9 +51,7 @@ export default function StudentDetailsPage() {
       setDeleteMessage('')
     }
   }
-
   const isAdmin = user?.role === 'ADMIN'
-
   return (
     <main>
       <Button as={Link} to="/students" variant="outline-secondary" size="sm" className="mb-3">
@@ -138,10 +109,16 @@ export default function StudentDetailsPage() {
         </Modal.Header>
         <Modal.Body>
           Студент <strong>{student?.fullName}</strong> будет удалён навсегда. За что так с ним?
-          {deleteMessage && <Alert variant="danger" className="mt-3 mb-0">{deleteMessage}</Alert>}
+          {deleteMessage && (
+            <Alert variant="danger" className="mt-3 mb-0">
+              {deleteMessage}
+            </Alert>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeConfirm} disabled={deleting}>Отмена</Button>
+          <Button variant="secondary" onClick={closeConfirm} disabled={deleting}>
+            Отмена
+          </Button>
           <Button variant="danger" onClick={handleDelete} disabled={deleting}>
             {deleting && <Spinner animation="border" size="sm" className="me-2" />}
             {deleting ? 'Удаляем...' : 'Удалить'}

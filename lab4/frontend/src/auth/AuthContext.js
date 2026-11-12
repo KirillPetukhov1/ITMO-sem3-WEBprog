@@ -1,13 +1,19 @@
-import { createContext, useContext } from 'react'
+import { useStore } from 'zustand'
 
-export const AuthContext = createContext(null)
+import { sessionStore } from '../state/sessionStore.js'
+import { session } from '../app/services.js'
+
+const setSessionMessage = (sessionMessage) =>
+  sessionStore.setState({
+    sessionMessage
+  })
 
 export function useAuth() {
-  const auth = useContext(AuthContext)
-
-  if (auth === null) {
-    throw new Error('useAuth потерял AuthProvider, заверни компонент в него')
+  const state = useStore(sessionStore)
+  return {
+    ...state,
+    setTokens: session.accept,
+    signOut: session.signOut,
+    setSessionMessage
   }
-
-  return auth
 }

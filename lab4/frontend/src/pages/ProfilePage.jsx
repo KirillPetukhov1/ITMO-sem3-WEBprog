@@ -14,24 +14,20 @@ export default function ProfilePage() {
     if (isLoggingOut) {
       return
     }
-
     setErrorMessage('')
     setIsLoggingOut(true)
-
     try {
       await signOut()
-      navigate('/login', { replace: true })
-    }
-    catch {
+      navigate('/login', {
+        replace: true
+      })
+    } catch {
       setErrorMessage('выход не вышел, ты тут навечно...')
-    }
-    finally {
+    } finally {
       setIsLoggingOut(false)
     }
   }
-
   let profile = null
-
   if (user !== null) {
     profile = (
       <ListGroup variant="flush">
@@ -46,14 +42,14 @@ export default function ProfilePage() {
       </ListGroup>
     )
   }
-
-
   return (
     <main>
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
           <Card>
-            <Card.Header as="h1" className="h4">Профиль</Card.Header>
+            <Card.Header as="h1" className="h4">
+              Профиль
+            </Card.Header>
 
             {user === null && userMessage === '' && (
               <Card.Body>
@@ -64,7 +60,9 @@ export default function ProfilePage() {
 
             {userMessage && (
               <Card.Body>
-                <Alert variant="danger" className="mb-0">{userMessage}</Alert>
+                <Alert variant="danger" className="mb-0">
+                  {userMessage}
+                </Alert>
               </Card.Body>
             )}
 
@@ -77,9 +75,15 @@ export default function ProfilePage() {
               {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
 
               <Stack direction="horizontal" gap={2}>
-                <Button as={Link} to="/students">открыть данные студентов</Button>
-                <Button variant="outline-danger" className="ms-auto"
-                  onClick={handleLogout} disabled={isLoggingOut}>
+                <Button as={Link} to="/students">
+                  открыть данные студентов
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  className="ms-auto"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
                   {isLoggingOut && <Spinner animation="border" size="sm" className="me-2" />}
                   {isLoggingOut ? 'Выходим...' : 'Выйти'}
                 </Button>

@@ -1,43 +1,66 @@
-import { ApiError, requestJson } from './httpClient.js'
+import { ApiError } from '../shared/errors.js'
 
-const sessionOptions = {
-  method: 'POST',
-  headers: { 'X-Requested-With': 'XMLHttpRequest' },
-  credentials: 'same-origin'
-}
-
-export async function login(credentials) {
-  try {
-    return await requestJson('/api/auth/session/login', {
-      ...sessionOptions,
-      headers: { ...sessionOptions.headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
+export function createAuthApi(request) {
+  const post = (operation, body) =>
+    request(`/api/auth/${operation}`, {
+      method: 'POST',
+      body
     })
-  }
-  catch (error) {
-    if (error.status === 401) {
-      throw new ApiError('Неверное имя пользователя или пароль', 401, 'UNAUTHORIZED')
+  const credentials = (values, registration) => {
+    const { username, password, email } = values
+    const details = {}
+    let minPasswordLength = 1
+    if (registration) {
+      minPasswordLength = 8
     }
-    throw error
+    if (
+      typeof username !== 'string' ||
+      !username.trim() ||
+      username.length > 50 ||
+      (registration && !/^[A-Za-z0-9_.-]{3,50}$/.test(username))
+    ) {
+      details.username = ['Некорректный логин']
+    }
+    if (
+      typeof password !== 'string' ||
+      password.length < minPasswordLength ||
+      password.length > 72 ||
+      new TextEncoder().encode(password).length > 72
+    ) {
+      details.password = ['Некорректная длина пароля: максимум 72 байта UTF-8']
+    }
+    if (
+      registration &&
+      (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    ) {
+      details.email = ['Некорректный email.']
+    }
+    if (Object.keys(details).length) {
+      throw new ApiError('Проверьте данные', 422, 'VALIDATION_ERROR', details)
+    }
+    if (registration) {
+      return {
+        username,
+        password,
+        email
+      }
+    } else {
+      return {
+        username,
+        password
+      }
+    }
   }
-}
-
-export function register(values) {
-  return requestJson('/api/auth/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(values)
-  }, fetch, false)
-}
-
-export function refreshSession() {
-  return fetch('/api/auth/session/refresh', sessionOptions)
-}
-
-export function logout() {
-  return requestJson('/api/auth/session/logout', sessionOptions, fetch, false)
-}
-
-export function getCurrentUser(authFetch) {
-  return requestJson('/api/auth/session/me', {}, authFetch)
+  return {
+    login: (values) => post('login', credentials(values, false)),
+    register: (values) => post('register', credentials(values, true)),
+    refresh: (refreshToken) =>
+      post('refresh', {
+        refreshToken
+      }),
+    logout: (refreshToken) =>
+      post('logout', {
+        refreshToken
+      })
+  }
 }
