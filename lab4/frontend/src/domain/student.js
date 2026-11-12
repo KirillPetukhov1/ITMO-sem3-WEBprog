@@ -1,4 +1,4 @@
-import { ApiError } from '../shared/errors.js'
+import { ApiError } from '../shared/errors.js';
 
 export const studentFields = [
   'isuId',
@@ -8,157 +8,157 @@ export const studentFields = [
   'room',
   'settlementDate',
   'isForeigner',
-  'notes'
-]
+  'notes',
+];
 const ranges = {
   isuId: [100000, 999999],
   dormitory: [1, 99],
   room: [1, 9999],
   page: [1, 2147483647],
-  page_size: [1, 100]
-}
+  page_size: [1, 100],
+};
 
 function invalid(field, message) {
   throw new ApiError('Проверьте введенные данные', 422, 'VALIDATION_ERROR', {
-    [field]: [message]
-  })
+    [field]: [message],
+  });
 }
 
 function validDate(value) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false
+    return false;
   }
-  const date = new Date(value + 'T00:00:00Z')
-  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+  const date = new Date(value + 'T00:00:00Z');
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 function validateText(field, value, filter) {
-  let min = 0
-  let max = 500
+  let min = 0;
+  let max = 500;
   if (field === 'fullName') {
-    min = 5
-    max = 100
+    min = 5;
+    max = 100;
   }
   if (filter) {
-    min = 1
+    min = 1;
   }
   if (typeof value !== 'string' || value.length < min || value.length > max) {
-    invalid(field, `Длина от ${min} до ${max} символов`)
+    invalid(field, `Длина от ${min} до ${max} символов`);
   }
 }
 
 function validate(field, value, filter = false) {
   if (ranges[field]) {
-    const [min, max] = ranges[field]
+    const [min, max] = ranges[field];
     if (!Number.isInteger(value) || value < min || value > max) {
-      invalid(field, `Ожидается целое число от ${min} до ${max}.`)
+      invalid(field, `Ожидается целое число от ${min} до ${max}.`);
     }
-    return
+    return;
   }
 
   switch (field) {
     case 'isForeigner':
       if (typeof value !== 'boolean') {
-        invalid(field, 'Ожидается логическое значение')
+        invalid(field, 'Ожидается логическое значение');
       }
-      return
+      return;
     case 'settlementDate':
       if (!validDate(value) || (!filter && value < '2000-01-01')) {
-        invalid(field, 'Некорректная дата')
+        invalid(field, 'Некорректная дата');
       }
-      return
+      return;
     case 'group':
       if (typeof value !== 'string' || !/^[A-Z][0-9]{4}$/.test(value)) {
-        invalid(field, 'Ожидается заглавная латинская буква и 4 цифры')
+        invalid(field, 'Ожидается заглавная латинская буква и 4 цифры');
       }
-      return
+      return;
     case 'fullName':
     case 'notes':
-      validateText(field, value, filter)
-      return
+      validateText(field, value, filter);
+      return;
   }
 }
 
 export function studentDto(values, patch = false) {
   if (patch && Object.hasOwn(values, 'isuId')) {
-    invalid('isuId', 'ИСУ нельзя изменять')
+    invalid('isuId', 'ИСУ нельзя изменять');
   }
-  const dto = {}
+  const dto = {};
   for (const field of studentFields) {
     if (patch && field === 'isuId') {
-      continue
+      continue;
     }
     if (!Object.hasOwn(values, field)) {
       if (patch || field === 'notes') {
-        continue
+        continue;
       }
-      invalid(field, 'Обязательное поле')
+      invalid(field, 'Обязательное поле');
     }
-    let value
+    let value;
     if (typeof values[field] === 'string') {
-      value = values[field].trim()
+      value = values[field].trim();
     } else {
-      value = values[field]
+      value = values[field];
     }
-    validate(field, value)
-    dto[field] = value
+    validate(field, value);
+    dto[field] = value;
   }
-  return dto
+  return dto;
 }
 
 function validateSearchField(field, value) {
   if (field === 'sortBy') {
     if (!studentFields.includes(value)) {
-      invalid(field, 'Неизвестное поле сортировки')
+      invalid(field, 'Неизвестное поле сортировки');
     }
-    return
+    return;
   }
   if (field === 'order') {
     if (!['asc', 'desc'].includes(value)) {
-      invalid(field, 'Ожидается asc или desc')
+      invalid(field, 'Ожидается asc или desc');
     }
-    return
+    return;
   }
-  validate(field, value, true)
+  validate(field, value, true);
 }
 
 export function searchDto(values = {}) {
-  const dto = {}
+  const dto = {};
   for (const field of [...studentFields, 'sortBy', 'order', 'page', 'page_size']) {
-    let value = values[field]
+    let value = values[field];
     if (value === undefined || value === '') {
-      continue
+      continue;
     }
     if (typeof value === 'string') {
-      value = value.trim()
+      value = value.trim();
     }
     if (value === '') {
-      continue
+      continue;
     }
     if (ranges[field] && typeof value === 'string' && /^\d+$/.test(value)) {
-      value = Number(value)
+      value = Number(value);
     }
     if (field === 'isForeigner' && ['true', 'false'].includes(value)) {
-      value = value === 'true'
+      value = value === 'true';
     }
-    validateSearchField(field, value)
-    dto[field] = value
+    validateSearchField(field, value);
+    dto[field] = value;
   }
-  return dto
+  return dto;
 }
 
 export function studentFromDto(dto) {
   if (!dto || typeof dto !== 'object') {
-    throw new ApiError('Некорректный студент', 0, 'INVALID_RESPONSE')
+    throw new ApiError('Некорректный студент', 0, 'INVALID_RESPONSE');
   }
   try {
     for (const field of studentFields) {
-      validate(field, dto[field])
+      validate(field, dto[field]);
     }
   } catch {
-    throw new ApiError('Некорректный студент в ответе', 0, 'INVALID_RESPONSE')
+    throw new ApiError('Некорректный студент в ответе', 0, 'INVALID_RESPONSE');
   }
-  return Object.fromEntries(studentFields.map((field) => [field, dto[field]]))
+  return Object.fromEntries(studentFields.map((field) => [field, dto[field]]));
 }
 
 export function pageFromDto(dto) {
@@ -172,7 +172,7 @@ export function pageFromDto(dto) {
     !Number.isInteger(dto.total_pages) ||
     dto.total_pages < 1
   ) {
-    throw new ApiError('Некорректная страница', 0, 'INVALID_RESPONSE')
+    throw new ApiError('Некорректная страница', 0, 'INVALID_RESPONSE');
   }
   return {
     count: dto.count,
@@ -181,6 +181,6 @@ export function pageFromDto(dto) {
     total_pages: dto.total_pages,
     next: dto.next,
     previous: dto.previous,
-    results: dto.results.map(studentFromDto)
-  }
+    results: dto.results.map(studentFromDto),
+  };
 }

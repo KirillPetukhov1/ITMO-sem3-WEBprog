@@ -1,46 +1,46 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Alert, Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
 
-import { getErrorMessage } from '../shared/errors.js'
-import { authApi } from '../app/services.js'
+import { getErrorMessage } from '../shared/errors.js';
+import { authApi } from '../app/services.js';
 
 export default function RegisterPage() {
-  const [message, setMessage] = useState('')
-  const [isError, setIsError] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {
-    event.preventDefault()
+    event.preventDefault();
     if (isSubmitting) {
-      return
+      return;
     }
-    setMessage('')
-    setIsError(false)
-    const form = event.currentTarget
-    const data = new FormData(form)
-    const email = data.get('email').trim()
-    const username = data.get('username').trim()
-    const password = data.get('password')
+    setMessage('');
+    setIsError(false);
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const email = data.get('email').trim();
+    const username = data.get('username').trim();
+    const password = data.get('password');
     if (new TextEncoder().encode(password).length > 72) {
-      setIsError(true)
-      setMessage('Пароль должен занимать не более 72 байт UTF-8.')
-      return
+      setIsError(true);
+      setMessage('пароль должен занимать не более 72 байт UTF-8.');
+      return;
     }
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       await authApi.register({
         username,
         email,
-        password
-      })
-      form.reset()
-      setMessage('аккаунт готов, прошу к нашему шалашу')
+        password,
+      });
+      form.reset();
+      setMessage('Аккаунт готов, прошу к нашему шалашу');
     } catch (error) {
-      setIsError(true)
-      setMessage(getErrorMessage(error))
+      setIsError(true);
+      setMessage(getErrorMessage(error));
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
   return (
@@ -110,5 +110,5 @@ export default function RegisterPage() {
         </Col>
       </Row>
     </main>
-  )
+  );
 }

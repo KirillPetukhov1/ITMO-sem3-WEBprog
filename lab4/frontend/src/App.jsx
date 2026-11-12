@@ -1,23 +1,23 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Container } from 'react-bootstrap'
-import LoginPage from './pages/LoginPage.jsx'
-import ProfilePage from './pages/ProfilePage.jsx'
-import RegisterPage from './pages/RegisterPage.jsx'
-import StudentsPage from './pages/StudentsPage.jsx'
-import StudentDetailsPage from './pages/StudentDetailsPage.jsx'
-import CreateStudentPage from './pages/CreateStudentPage.jsx'
-import EditStudentPage from './pages/EditStudentPage.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
-import Navigation from './components/Navigation.jsx'
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
+import LoginPage from './pages/LoginPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import StudentsPage from './pages/StudentsPage.jsx';
+import StudentDetailsPage from './pages/StudentDetailsPage.jsx';
+import CreateStudentPage from './pages/CreateStudentPage.jsx';
+import EditStudentPage from './pages/EditStudentPage.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import Navigation from './components/Navigation.jsx';
 
 function StudentRoute({ edit = false }) {
-  const { isuId } = useParams()
+  const { isuId } = useParams();
 
   // ису другой - карточку тоже собираем заново
   if (edit) {
-    return <EditStudentPage key={isuId} />
+    return <EditStudentPage key={isuId} />;
   }
-  return <StudentDetailsPage key={isuId} />
+  return <StudentDetailsPage key={isuId} />;
 }
 
 export default function App() {
@@ -81,5 +81,5 @@ export default function App() {
         </Routes>
       </Container>
     </BrowserRouter>
-  )
+  );
 }

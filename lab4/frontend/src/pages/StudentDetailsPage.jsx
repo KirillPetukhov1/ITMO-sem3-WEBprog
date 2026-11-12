@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Alert, Badge, Button, Card, ListGroup, Modal, Spinner, Stack } from 'react-bootstrap'
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Alert, Badge, Button, Card, ListGroup, Modal, Spinner, Stack } from 'react-bootstrap';
 
-import useStudent from '../hooks/useStudent.js'
-import { useAuth } from '../auth/AuthContext.js'
-import { getErrorMessage } from '../shared/errors.js'
-import { deleteStudent } from '../features/students/studentActions.js'
+import useStudent from '../hooks/useStudent.js';
+import { useAuth } from '../auth/AuthContext.js';
+import { getErrorMessage } from '../shared/errors.js';
+import { deleteStudent } from '../features/students/studentActions.js';
 
 function Field({ label, children }) {
   return (
@@ -13,45 +13,45 @@ function Field({ label, children }) {
       <span className="text-muted">{label}</span>
       <span>{children}</span>
     </ListGroup.Item>
-  )
+  );
 }
 
 export default function StudentDetailsPage() {
-  const { isuId } = useParams()
-  const { user } = useAuth()
-  const navigate = useNavigate()
-  const { data: student, error: message } = useStudent(isuId)
-  const [deleting, setDeleting] = useState(false)
-  const [deleteMessage, setDeleteMessage] = useState('')
-  const [showConfirm, setShowConfirm] = useState(false)
+  const { isuId } = useParams();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: student, error: message } = useStudent(isuId);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
   async function handleDelete() {
     if (deleting) {
-      return
+      return;
     }
-    setDeleteMessage('')
-    setDeleting(true)
+    setDeleteMessage('');
+    setDeleting(true);
     try {
-      await deleteStudent(isuId)
+      await deleteStudent(isuId);
       navigate('/students', {
-        replace: true
-      })
+        replace: true,
+      });
     } catch (error) {
       if (error.name !== 'AbortError') {
-        setDeleteMessage(getErrorMessage(error))
+        setDeleteMessage(getErrorMessage(error));
       }
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
   }
 
   function closeConfirm() {
     if (!deleting) {
-      setShowConfirm(false)
-      setDeleteMessage('')
+      setShowConfirm(false);
+      setDeleteMessage('');
     }
   }
-  const isAdmin = user?.role === 'ADMIN'
+  const isAdmin = user?.role === 'ADMIN';
   return (
     <main>
       <Button as={Link} to="/students" variant="outline-secondary" size="sm" className="mb-3">
@@ -126,5 +126,5 @@ export default function StudentDetailsPage() {
         </Modal.Footer>
       </Modal>
     </main>
-  )
+  );
 }

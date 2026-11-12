@@ -1,17 +1,17 @@
-import { ApiError } from '../shared/errors.js'
+import { ApiError } from '../shared/errors.js';
 
 export function createAuthApi(request) {
   const post = (operation, body) =>
     request(`/api/auth/${operation}`, {
       method: 'POST',
-      body
-    })
+      body,
+    });
   const credentials = (values, registration) => {
-    const { username, password, email } = values
-    const details = {}
-    let minPasswordLength = 1
+    const { username, password, email } = values;
+    const details = {};
+    let minPasswordLength = 1;
     if (registration) {
-      minPasswordLength = 8
+      minPasswordLength = 8;
     }
     if (
       typeof username !== 'string' ||
@@ -19,7 +19,7 @@ export function createAuthApi(request) {
       username.length > 50 ||
       (registration && !/^[A-Za-z0-9_.-]{3,50}$/.test(username))
     ) {
-      details.username = ['Некорректный логин']
+      details.username = ['Некорректный логин'];
     }
     if (
       typeof password !== 'string' ||
@@ -27,40 +27,40 @@ export function createAuthApi(request) {
       password.length > 72 ||
       new TextEncoder().encode(password).length > 72
     ) {
-      details.password = ['Некорректная длина пароля: максимум 72 байта UTF-8']
+      details.password = ['Некорректная длина пароля: максимум 72 байта UTF-8'];
     }
     if (
       registration &&
       (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     ) {
-      details.email = ['Некорректный email.']
+      details.email = ['Некорректный email.'];
     }
     if (Object.keys(details).length) {
-      throw new ApiError('Проверьте данные', 422, 'VALIDATION_ERROR', details)
+      throw new ApiError('Проверьте данные', 422, 'VALIDATION_ERROR', details);
     }
     if (registration) {
       return {
         username,
         password,
-        email
-      }
+        email,
+      };
     } else {
       return {
         username,
-        password
-      }
+        password,
+      };
     }
-  }
+  };
   return {
     login: (values) => post('login', credentials(values, false)),
     register: (values) => post('register', credentials(values, true)),
     refresh: (refreshToken) =>
       post('refresh', {
-        refreshToken
+        refreshToken,
       }),
     logout: (refreshToken) =>
       post('logout', {
-        refreshToken
-      })
-  }
+        refreshToken,
+      }),
+  };
 }

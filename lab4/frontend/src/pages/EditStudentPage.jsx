@@ -1,44 +1,44 @@
-import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Alert, Button, Card, Spinner } from 'react-bootstrap'
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Alert, Button, Card, Spinner } from 'react-bootstrap';
 
-import { getErrorMessage } from '../shared/errors.js'
-import { getStudent, updateStudent } from '../features/students/studentActions.js'
-import StudentForm from '../components/StudentForm.jsx'
+import { getErrorMessage } from '../shared/errors.js';
+import { getStudent, updateStudent } from '../features/students/studentActions.js';
+import StudentForm from '../components/StudentForm.jsx';
 
 export default function EditStudentPage() {
-  const { isuId } = useParams()
-  const navigate = useNavigate()
-  const [student, setStudent] = useState(null)
-  const [message, setMessage] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const { isuId } = useParams();
+  const navigate = useNavigate();
+  const [student, setStudent] = useState(null);
+  const [message, setMessage] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
-    const controller = new AbortController()
+    const controller = new AbortController();
     getStudent(isuId, controller.signal)
       .then((result) => setStudent(result))
       .catch((error) => {
         if (error.name !== 'AbortError') {
-          setMessage(getErrorMessage(error))
+          setMessage(getErrorMessage(error));
         }
-      })
-    return () => controller.abort()
-  }, [isuId])
+      });
+    return () => controller.abort();
+  }, [isuId]);
 
   async function handleSave(values) {
     if (submitting) {
-      return
+      return;
     }
-    setMessage('')
-    setSubmitting(true)
+    setMessage('');
+    setSubmitting(true);
     try {
-      await updateStudent(isuId, values)
+      await updateStudent(isuId, values);
       navigate('/students/' + isuId, {
-        replace: true
-      })
+        replace: true,
+      });
     } catch (error) {
-      setMessage(getErrorMessage(error))
+      setMessage(getErrorMessage(error));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
   return (
@@ -71,5 +71,5 @@ export default function EditStudentPage() {
         </Card.Body>
       </Card>
     </main>
-  )
+  );
 }

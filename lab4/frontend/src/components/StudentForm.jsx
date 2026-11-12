@@ -1,9 +1,9 @@
-import { Button, Form } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap';
 
 export default function StudentForm({ student = null, onSubmit, submitting, buttonText }) {
   function handleSubmit(event) {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
     const values = {
       fullName: data.get('fullName').trim(),
       group: data.get('group').trim(),
@@ -11,12 +11,12 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
       room: Number(data.get('room')),
       settlementDate: data.get('settlementDate'),
       isForeigner: data.get('isForeigner') === 'true',
-      notes: data.get('notes').trim()
-    }
+      notes: data.get('notes').trim(),
+    };
     if (student === null) {
-      values.isuId = Number(data.get('isuId'))
+      values.isuId = Number(data.get('isuId'));
     }
-    onSubmit(values)
+    onSubmit(values);
   }
   return (
     <Form onSubmit={handleSubmit}>
@@ -114,5 +114,5 @@ export default function StudentForm({ student = null, onSubmit, submitting, butt
         {submitting ? 'Сохраняем...' : buttonText}
       </Button>
     </Form>
-  )
+  );
 }

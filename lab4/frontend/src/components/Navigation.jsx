@@ -1,12 +1,12 @@
-import { Link, NavLink } from 'react-router-dom'
-import { Badge, Container, Nav, Navbar } from 'react-bootstrap'
+import { Link, NavLink } from 'react-router-dom';
+import { Badge, Container, Nav, Navbar } from 'react-bootstrap';
 
-import { useAuth } from '../auth/AuthContext.js'
+import { useAuth } from '../auth/AuthContext.js';
 
 export default function Navigation() {
-  const { tokens, user, restoring } = useAuth()
+  const { tokens, user, restoring } = useAuth();
   if (restoring) {
-    return null
+    return null;
   }
   let links = (
     <>
@@ -17,16 +17,16 @@ export default function Navigation() {
         регистрация
       </Nav.Link>
     </>
-  )
-  let userInfo = null
+  );
+  let userInfo = null;
   if (tokens !== null) {
-    let adminLink = null
+    let adminLink = null;
     if (user?.role === 'ADMIN') {
       adminLink = (
         <Nav.Link as={NavLink} to="/students/new">
           создать студента
         </Nav.Link>
-      )
+      );
     }
     links = (
       <>
@@ -38,7 +38,7 @@ export default function Navigation() {
           профиль
         </Nav.Link>
       </>
-    )
+    );
   }
   if (user !== null) {
     userInfo = (
@@ -46,7 +46,7 @@ export default function Navigation() {
         {user.username}{' '}
         <Badge bg={user.role === 'ADMIN' ? 'danger' : 'secondary'}>{user.role}</Badge>
       </Navbar.Text>
-    )
+    );
   }
   return (
     <Navbar bg="dark" data-bs-theme="dark" expand="md" className="mb-4">
@@ -61,5 +61,5 @@ export default function Navigation() {
         </Navbar.Collapse>
       </Container>
     </Navbar>
-  )
+  );
 }

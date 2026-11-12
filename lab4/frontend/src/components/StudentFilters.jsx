@@ -1,10 +1,10 @@
-import { Button, Card, Form, Stack } from 'react-bootstrap'
+import { Button, Card, Form, Stack } from 'react-bootstrap';
 
 export default function StudentFilters({ onNameChange, onApply }) {
   function handleSubmit(event) {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const filters = {}
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const filters = {};
     for (const name of [
       'group',
       'isuId',
@@ -12,22 +12,22 @@ export default function StudentFilters({ onNameChange, onApply }) {
       'room',
       'settlementDate',
       'isForeigner',
-      'notes'
+      'notes',
     ]) {
-      let value = data.get(name)
+      let value = data.get(name);
       if (!value) {
-        value = ''
+        value = '';
       }
-      filters[name] = String(value).trim()
+      filters[name] = String(value).trim();
     }
-    onApply(filters)
+    onApply(filters);
   }
 
   function handleReset(event) {
     // чистим и форму и фильтры
-    event.currentTarget.form.reset()
-    onNameChange('')
-    onApply({})
+    event.currentTarget.form.reset();
+    onNameChange('');
+    onApply({});
   }
   return (
     <Card>
@@ -94,5 +94,5 @@ export default function StudentFilters({ onNameChange, onApply }) {
         </Form>
       </Card.Body>
     </Card>
-  )
+  );
 }

@@ -1,31 +1,31 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Alert, Button, Card } from 'react-bootstrap'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Alert, Button, Card } from 'react-bootstrap';
 
-import { getErrorMessage } from '../shared/errors.js'
-import { createStudent } from '../features/students/studentActions.js'
-import StudentForm from '../components/StudentForm.jsx'
+import { getErrorMessage } from '../shared/errors.js';
+import { createStudent } from '../features/students/studentActions.js';
+import StudentForm from '../components/StudentForm.jsx';
 
 export default function CreateStudentPage() {
-  const navigate = useNavigate()
-  const [submitting, setSubmitting] = useState(false)
-  const [message, setMessage] = useState('')
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState('');
 
   async function handleCreate(student) {
     if (submitting) {
-      return
+      return;
     }
-    setMessage('')
-    setSubmitting(true)
+    setMessage('');
+    setSubmitting(true);
     try {
-      const created = await createStudent(student)
+      const created = await createStudent(student);
       navigate('/students/' + created.isuId, {
-        replace: true
-      })
+        replace: true,
+      });
     } catch (error) {
-      setMessage(getErrorMessage(error))
+      setMessage(getErrorMessage(error));
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
   return (
@@ -44,5 +44,5 @@ export default function CreateStudentPage() {
         </Card.Body>
       </Card>
     </main>
-  )
+  );
 }

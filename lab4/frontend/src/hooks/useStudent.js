@@ -1,16 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo } from 'react';
 
-import { studentsApi } from '../app/services.js'
-import useStudentResource from './useStudentResource.js'
+import { studentsApi } from '../app/services.js';
+import useStudentResource from './useStudentResource.js';
 
-const load = (query, signal) => studentsApi.get(query.isuId, signal)
+const load = (query, signal) => studentsApi.get(query.isuId, signal);
 
 export default function useStudent(isuId) {
   const query = useMemo(
     () => ({
-      isuId
+      isuId,
     }),
-    [isuId]
-  )
-  return useStudentResource(query, load)
+    [isuId],
+  );
+  return useStudentResource(query, load);
 }

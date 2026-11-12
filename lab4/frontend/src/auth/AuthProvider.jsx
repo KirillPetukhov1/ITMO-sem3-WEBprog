@@ -1,10 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect } from 'react';
 
-import { session } from '../app/services.js'
+import { session } from '../app/services.js';
 
 export function AuthProvider({ children }) {
   useEffect(() => {
-    void session.restore()
-  }, [])
-  return children
+    void session.restore();
+  }, []);
+  return children;
 }

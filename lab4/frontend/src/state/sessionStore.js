@@ -1,4 +1,4 @@
-import { createStore } from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla';
 
 export const sessionStore = createStore(() => ({
   tokens: null,
@@ -6,5 +6,5 @@ export const sessionStore = createStore(() => ({
   restoring: true,
   sessionMessage: '',
   userMessage: '',
-  generation: 0
-}))
+  generation: 0,
+}));

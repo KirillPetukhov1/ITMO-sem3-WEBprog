@@ -1,20 +1,20 @@
-let env = import.meta.env
+let env = import.meta.env;
 if (!env) {
-  env = {}
+  env = {};
 }
-let apiBaseUrl = env.VITE_API_BASE_URL
+let apiBaseUrl = env.VITE_API_BASE_URL;
 if (!apiBaseUrl) {
-  apiBaseUrl = ''
+  apiBaseUrl = '';
 }
-let pollInterval = Number(env.VITE_POLL_INTERVAL_MS)
+let pollInterval = Number(env.VITE_POLL_INTERVAL_MS);
 if (!pollInterval) {
-  pollInterval = 5000
+  pollInterval = 5000;
 }
-pollInterval = Math.max(1000, pollInterval)
+pollInterval = Math.max(1000, pollInterval);
 
 export const config = Object.freeze({
   apiBaseUrl,
   pollInterval,
   searchDelay: 300,
-  requestTimeout: 15000
-})
+  requestTimeout: 15000,
+});

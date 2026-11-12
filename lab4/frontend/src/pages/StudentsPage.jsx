@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Alert,
   Button,
@@ -10,21 +10,21 @@ import {
   Row,
   Spinner,
   Stack,
-  Table
-} from 'react-bootstrap'
+  Table,
+} from 'react-bootstrap';
 
-import { useAuth } from '../auth/AuthContext.js'
-import StudentFilters from '../components/StudentFilters.jsx'
-import useStudentList from '../hooks/useStudentList.js'
+import { useAuth } from '../auth/AuthContext.js';
+import StudentFilters from '../components/StudentFilters.jsx';
+import useStudentList from '../hooks/useStudentList.js';
 
 export default function StudentsPage() {
-  const { user } = useAuth()
-  const [sortBy, setSortBy] = useState('isuId')
-  const [order, setOrder] = useState('asc')
-  const [fullName, setFullName] = useState('')
-  const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState({})
-  const [reloadKey, setReloadKey] = useState(0)
+  const { user } = useAuth();
+  const [sortBy, setSortBy] = useState('isuId');
+  const [order, setOrder] = useState('asc');
+  const [fullName, setFullName] = useState('');
+  const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState({});
+  const [reloadKey, setReloadKey] = useState(0);
   const query = useMemo(() => {
     return {
       ...filters,
@@ -32,59 +32,59 @@ export default function StudentsPage() {
       sortBy,
       order,
       page,
-      reloadKey
-    }
-  }, [filters, fullName, sortBy, order, page, reloadKey])
-  const { loading, data, error } = useStudentList(query)
+      reloadKey,
+    };
+  }, [filters, fullName, sortBy, order, page, reloadKey]);
+  const { loading, data, error } = useStudentList(query);
   // Синхронизация с исправленным сервером номером страницы после удаления
   useEffect(() => {
     if (data?.correctedFrom) {
       setPage((current) => {
         if (current === data.correctedFrom) {
-          return data.page
+          return data.page;
         }
-        return current
-      })
+        return current;
+      });
     }
-  }, [data])
-  let students = data?.results
+  }, [data]);
+  let students = data?.results;
   if (!students) {
-    students = []
+    students = [];
   }
-  let totalPages = data?.total_pages
+  let totalPages = data?.total_pages;
   if (!totalPages) {
-    totalPages = 1
+    totalPages = 1;
   }
 
   function handleSearch(event) {
     //поиск по фио
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const name = data.get('fullName').trim()
-    setPage(1) // на первую страницу при поиске
-    setFullName(name)
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name = data.get('fullName').trim();
+    setPage(1); // на первую страницу при поиске
+    setFullName(name);
   }
 
   function handleNameChange(value) {
-    setFullName(value)
-    setPage(1) // поиск новый и первая страница
+    setFullName(value);
+    setPage(1); // поиск новый и первая страница
   }
 
   function handleApply(nextFilters) {
-    setFilters(nextFilters)
-    setPage(1)
+    setFilters(nextFilters);
+    setPage(1);
   }
 
   function handleSortBy(event) {
     //сортиров-очка
-    setSortBy(event.target.value)
-    setPage(1)
+    setSortBy(event.target.value);
+    setPage(1);
   }
 
   function handleOrder(event) {
     //порядок сортировки
-    setOrder(event.target.value)
-    setPage(1)
+    setOrder(event.target.value);
+    setPage(1);
   }
   return (
     <main>
@@ -218,5 +218,5 @@ export default function StudentsPage() {
         </Col>
       </Row>
     </main>
-  )
+  );
 }

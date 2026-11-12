@@ -1,30 +1,30 @@
-import { createStore } from 'zustand/vanilla'
+import { createStore } from 'zustand/vanilla';
 
 export const emptyResource = Object.freeze({
   loading: true,
   refreshing: false,
   data: null,
   error: '',
-  code: ''
-})
+  code: '',
+});
 
-export const studentsStore = createStore(() => ({ resources: {} }))
+export const studentsStore = createStore(() => ({ resources: {} }));
 
 export function writeResource(key, patch) {
   studentsStore.setState((state) => {
-    let current = state.resources[key]
+    let current = state.resources[key];
     if (!current) {
-      current = emptyResource
+      current = emptyResource;
     }
-    const resource = { ...current, ...patch }
-    return { resources: { ...state.resources, [key]: resource } }
-  })
+    const resource = { ...current, ...patch };
+    return { resources: { ...state.resources, [key]: resource } };
+  });
 }
 
 export function removeResource(key) {
   studentsStore.setState((state) => {
-    const resources = { ...state.resources }
-    delete resources[key]
-    return { resources }
-  })
+    const resources = { ...state.resources };
+    delete resources[key];
+    return { resources };
+  });
 }

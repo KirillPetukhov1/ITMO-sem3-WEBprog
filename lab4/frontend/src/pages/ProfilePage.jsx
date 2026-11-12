@@ -1,33 +1,33 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Alert, Badge, Button, Card, Col, ListGroup, Row, Spinner, Stack } from 'react-bootstrap'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Alert, Badge, Button, Card, Col, ListGroup, Row, Spinner, Stack } from 'react-bootstrap';
 
-import { useAuth } from '../auth/AuthContext.js'
+import { useAuth } from '../auth/AuthContext.js';
 
 export default function ProfilePage() {
-  const { user, userMessage, signOut } = useAuth()
-  const navigate = useNavigate()
-  const [errorMessage, setErrorMessage] = useState('')
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const { user, userMessage, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function handleLogout() {
     if (isLoggingOut) {
-      return
+      return;
     }
-    setErrorMessage('')
-    setIsLoggingOut(true)
+    setErrorMessage('');
+    setIsLoggingOut(true);
     try {
-      await signOut()
+      await signOut();
       navigate('/login', {
-        replace: true
-      })
+        replace: true,
+      });
     } catch {
-      setErrorMessage('выход не вышел, ты тут навечно...')
+      setErrorMessage('выход не вышел, ты тут навечно...');
     } finally {
-      setIsLoggingOut(false)
+      setIsLoggingOut(false);
     }
   }
-  let profile = null
+  let profile = null;
   if (user !== null) {
     profile = (
       <ListGroup variant="flush">
@@ -40,7 +40,7 @@ export default function ProfilePage() {
           <Badge bg={user.role === 'ADMIN' ? 'danger' : 'secondary'}>{user.role}</Badge>
         </ListGroup.Item>
       </ListGroup>
-    )
+    );
   }
   return (
     <main>
@@ -93,5 +93,5 @@ export default function ProfilePage() {
         </Col>
       </Row>
     </main>
-  )
+  );
 }
