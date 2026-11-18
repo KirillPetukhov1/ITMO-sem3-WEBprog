@@ -51,7 +51,9 @@ export default function StudentDetailsPage() {
       setDeleteMessage('');
     }
   }
+
   const isAdmin = user?.role === 'ADMIN';
+
   return (
     <main>
       <Button as={Link} to="/students" variant="outline-secondary" size="sm" className="mb-3">
