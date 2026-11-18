@@ -6,7 +6,7 @@ import { getSession } from '../lib/session.js';
 export const metadata = {
   title: {
     default: 'система управления разумом',
-    template: '%s · система управления разумом',
+    template: '%s | система управления разумом',
   },
   description: 'Учёт студентов общежитий',
 };
@@ -17,7 +17,7 @@ export const viewport = {
 };
 
 // общий каркас всех страниц: шапка рендерится на сервере
-// и сразу знает, кто вошёл (из куки), без мигания «гость → пользователь»
+// и сразу знает, кто вошёл (из куки), без мигания "гость -> пользователь"
 export default async function RootLayout({ children }) {
   const session = await getSession();
   return (

@@ -75,11 +75,11 @@ export default async function StudentsTable({ query }) {
   try {
     data = await readAuthorized((token) => listStudents(query, token));
   } catch (error) {
-    // после удаления страница могла исчезнуть — уходим на последнюю существующую
+    // после удаления страница могла исчезнуть - уходим на последнюю существующую
     if (error?.code === 'PAGE_NOT_FOUND' && Number.isInteger(error.details?.total_pages)) {
       redirect(studentsHref({ ...query, page: error.details.total_pages }));
     }
-    // кривые параметры в адресе — показываем ошибку прямо над таблицей
+    // кривые параметры в адресе - показываем ошибку прямо над таблицей
     if (error?.status === 422 || error?.status === 400) {
       return <div className="alert alert-warning">{getErrorMessage(error)}</div>;
     }
@@ -119,7 +119,7 @@ export default async function StudentsTable({ query }) {
       <nav aria-label="Страницы">
         <ul className="pagination justify-content-center">
           <PageLink query={query} page={page - 1} disabled={page <= 1} label="Назад">
-            ‹
+            {'<'}
           </PageLink>
           <li className="page-item active" aria-current="page">
             <span className="page-link">
@@ -127,7 +127,7 @@ export default async function StudentsTable({ query }) {
             </span>
           </li>
           <PageLink query={query} page={page + 1} disabled={page >= totalPages} label="Вперёд">
-            ›
+            {'>'}
           </PageLink>
         </ul>
       </nav>

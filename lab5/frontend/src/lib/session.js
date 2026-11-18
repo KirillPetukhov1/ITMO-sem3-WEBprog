@@ -13,7 +13,7 @@ import {
   userFromAccess,
 } from './tokens.js';
 
-// сессия текущего запроса. cache() — чтобы layout и page не читали куки дважды
+// сессия текущего запроса. cache() - чтобы layout и page не читали куки дважды
 export const getSession = cache(async () => {
   const store = await cookies();
   const token = store.get(ACCESS_COOKIE)?.value;
@@ -25,7 +25,7 @@ export const getSession = cache(async () => {
 });
 
 // для серверных компонентов: proxy уже не пустил бы сюда без куки,
-// но страница сама тоже проверяет — proxy не единственная защита
+// но страница сама тоже проверяет - proxy не единственная защита
 export async function requireSession() {
   const session = await getSession();
   if (!session) {

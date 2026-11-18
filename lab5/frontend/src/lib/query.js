@@ -22,7 +22,7 @@ export const SORT_OPTIONS = [
   ['notes', 'примечания'],
 ];
 
-// searchParams → плоский объект только с известными полями
+// searchParams -> плоский объект только с известными полями
 export function pickQuery(searchParams) {
   const get =
     typeof searchParams?.get === 'function'

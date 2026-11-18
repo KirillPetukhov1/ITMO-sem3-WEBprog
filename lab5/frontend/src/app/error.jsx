@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
-// error.jsx — граница ошибок: ловит исключения при рендере страниц
+// error.jsx - граница ошибок: ловит исключения при рендере страниц
 // (java недоступна, 500 и т.п.). обязательно клиентский компонент
 export default function ErrorPage({ error, reset }) {
   const router = useRouter();
@@ -23,7 +23,7 @@ export default function ErrorPage({ error, reset }) {
       <div className="alert alert-danger">
         <h1 className="h4">Что-то пошло не так</h1>
         <p className="mb-0">
-          Не удалось загрузить данные. Возможно, сервер недоступен — попробуйте ещё раз.
+          Не удалось загрузить данные. Возможно, сервер недоступен - попробуйте ещё раз.
         </p>
         {error?.digest && <p className="small text-body-secondary mb-0">код: {error.digest}</p>}
       </div>

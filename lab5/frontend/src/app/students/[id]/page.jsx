@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import DeleteStudentButton from '../../../components/DeleteStudentButton.jsx';
 import { loadStudent } from './loadStudent.js';
 
-// динамический маршрут: [id] в имени папки — номер ИСУ из адреса /students/123456
+// динамический маршрут: [id] в имени папки - номер ИСУ из адреса /students/123456
 export async function generateMetadata({ params }) {
   const { id } = await params;
   const { student } = await loadStudent(id);
@@ -49,7 +49,7 @@ export default async function StudentPage({ params }) {
           <Field label="Иностранец">{student.isForeigner ? 'да' : 'нет'}</Field>
           <li className="list-group-item">
             <div className="text-body-secondary mb-1">Примечания</div>
-            <div className="text-break">{student.notes || '—'}</div>
+            <div className="text-break">{student.notes || '-'}</div>
           </li>
         </ul>
 

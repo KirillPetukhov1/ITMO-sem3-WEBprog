@@ -17,7 +17,7 @@ function passwordTooLong(password) {
   return new TextEncoder().encode(password).length > 72;
 }
 
-// только относительные пути внутри приложения — иначе open redirect
+// только относительные пути внутри приложения - иначе open redirect
 function safeNext(value) {
   if (typeof value === 'string' && value.startsWith('/') && !value.startsWith('//')) {
     return value;
@@ -50,7 +50,7 @@ export async function registerAction(values) {
   const password = text(values?.password);
   const details = {};
   if (!USERNAME.test(username)) {
-    details.username = ['3–50 символов: латиница, цифры и . _ -'];
+    details.username = ['3-50 символов: латиница, цифры и . _ -'];
   }
   if (email.length > 254 || !EMAIL.test(email)) {
     details.email = ['Некорректный email.'];
@@ -78,7 +78,7 @@ export async function logoutAction() {
     try {
       await backendFetch('/api/auth/logout', { method: 'POST', body: { refreshToken } });
     } catch {
-      // токен уже мог протухнуть — куки всё равно чистим
+      // токен уже мог протухнуть - куки всё равно чистим
     }
   }
   await clearTokens();

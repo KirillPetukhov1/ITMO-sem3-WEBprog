@@ -32,8 +32,8 @@ export default async function StudentsPage({ searchParams }) {
         </div>
         <div className="col-lg-9">
           <StudentSearch />
-          {/* streaming: шапка и фильтры уходят в браузер сразу, таблица —
-              когда java ответит. key — чтобы при смене фильтров снова
+          {/* streaming: шапка и фильтры уходят в браузер сразу, таблица -
+              когда java ответит. key - чтобы при смене фильтров снова
               показать скелет */}
           <Suspense key={queryString(query)} fallback={<StudentsTableSkeleton />}>
             <StudentsTable query={query} />

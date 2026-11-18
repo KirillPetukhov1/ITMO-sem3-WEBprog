@@ -6,7 +6,7 @@ import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import { studentDto } from '../lib/domain/student.js';
 import { getErrorMessage } from '../lib/errors.js';
 
-// action — server action (создать или изменить), её передаёт серверная страница
+// action - server action (создать или изменить), её передаёт серверная страница
 export default function StudentForm({ student = null, action, buttonText }) {
   const [error, setError] = useState('');
   const [pending, startTransition] = useTransition();
@@ -29,7 +29,7 @@ export default function StudentForm({ student = null, action, buttonText }) {
     if (student === null) {
       values.isuId = Number(data.get('isuId'));
     }
-    // та же проверка, что и на сервере — ошибку видно без запроса
+    // та же проверка, что и на сервере - ошибку видно без запроса
     try {
       studentDto(values, student !== null);
     } catch (validationError) {

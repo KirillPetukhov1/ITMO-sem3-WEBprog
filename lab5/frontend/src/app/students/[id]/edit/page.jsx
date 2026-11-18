@@ -17,7 +17,7 @@ export default async function EditStudentPage({ params }) {
   if (!student) {
     notFound();
   }
-  // bind: номер ИСУ «вшивается» в server action, форма передаёт только поля
+  // bind: номер ИСУ "вшивается" в server action, форма передаёт только поля
   const action = updateStudentAction.bind(null, id);
   return (
     <main>

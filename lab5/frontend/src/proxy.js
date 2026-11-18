@@ -27,13 +27,13 @@ export async function proxy(request) {
     return NextResponse.next();
   }
 
-  // access-токена нет или он вот-вот истечёт — пробуем обновить по refresh
+  // access-токена нет или он вот-вот истечёт - пробуем обновить по refresh
   const pair = await refreshTokens(request.cookies.get(REFRESH_COOKIE)?.value);
   if (!pair) {
     return toLogin(request);
   }
 
-  // новые куки нужны и браузеру (Set-Cookie), и текущему рендеру —
+  // новые куки нужны и браузеру (Set-Cookie), и текущему рендеру -
   // поэтому подменяем их ещё и в заголовках самого запроса
   request.cookies.set(ACCESS_COOKIE, pair.accessToken);
   request.cookies.set(REFRESH_COOKIE, pair.refreshToken);

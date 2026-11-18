@@ -1,12 +1,12 @@
-# Лабораторная работа №5. Frontend на метафреймворке (Next.js)
+# Лабораторная работа 5. Frontend на метафреймворке (Next.js)
 
-Frontend из лабораторной №4 (React + Vite) перенесён на **Next.js 16 (App Router)**.
-Бизнес-логика, авторизация и БД остаются в Java-backend (`backend/`, из лабораторных №3–4).
+Frontend из лабораторной 4 (React + Vite) перенесён на **Next.js 16 (App Router)**.
+Бизнес-логика, авторизация и БД остаются в Java-backend (`backend/`, из лабораторных 3-4).
 
 ## Запуск
 
 ```bash
-cp .env.example .env   # заполнить DB_PASSWORD, JWT_SECRET (base64, ≥32 байт), ADMIN_*
+cp .env.example .env   # заполнить DB_PASSWORD, JWT_SECRET (base64, >=32 байт), ADMIN_*
 docker compose up --build
 ```
 
@@ -28,7 +28,7 @@ npm run format       # prettier
 ## Как устроено
 
 ```
-браузер ──► Next.js (сервер) ──► Java REST API ──► PostgreSQL
+браузер --> Next.js (сервер) --> Java REST API --> PostgreSQL
             SSR, proxy, server actions, кеш
 ```
 
@@ -37,16 +37,16 @@ npm run format       # prettier
 
 | Требование                         | Где                                                                                                                |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| SSR                                | все страницы — серверные компоненты (`src/app/**/page.jsx`)                                                        |
+| SSR                                | все страницы - серверные компоненты (`src/app/**/page.jsx`)                                                        |
 | Динамические маршруты              | `src/app/students/[id]/page.jsx`, `src/app/students/[id]/edit/page.jsx`                                            |
 | Middleware / защита                | `src/proxy.js` (в Next 16 `middleware.js` переименован в `proxy.js`)                                               |
 | Обновление access-токена           | `src/proxy.js` (до рендера), `actAuthorized` в `src/lib/session.js` (в server actions)                             |
 | Loading                            | `<Suspense>` со скелетом таблицы (streaming), `profile/loading.jsx`, спиннеры в формах                             |
-| Error                              | `src/app/error.jsx` (кнопка «Повторить»)                                                                           |
+| Error                              | `src/app/error.jsx` (кнопка "Повторить")                                                                           |
 | 404                                | `src/app/not-found.jsx`, `src/app/students/[id]/not-found.jsx` + `notFound()`                                      |
 | Кеширование                        | `src/lib/students.js`: `fetch(..., { cache: 'force-cache', next: { tags, revalidate } })`                          |
 | Сброс кеша после изменений         | `src/lib/actions/students.js`: `updateTag('students')`, `updateTag('student-<id>')`                                |
-| Роли                               | кнопки скрыты для USER, `/students/new` и `/edit` — «нет прав», server actions проверяют роль; окончательно — Java |
+| Роли                               | кнопки скрыты для USER, `/students/new` и `/edit` - "нет прав", server actions проверяют роль; окончательно - Java |
 | Поиск/фильтры/сортировка/пагинация | параметры в URL (`/students?group=A1234&page=2`), `src/lib/query.js`                                               |
 | Docker                             | `frontend/Dockerfile` (multi-stage, `output: 'standalone'`), `docker-compose.yml`                                  |
 

@@ -29,7 +29,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # браузер в java больше не ходит — только сервер next по внутренней сети.
+    # браузер в java больше не ходит - только сервер next по внутренней сети.
     # порт наружу оставлен для swagger, только на localhost
     ports:
       - "127.0.0.1:8080:8080"

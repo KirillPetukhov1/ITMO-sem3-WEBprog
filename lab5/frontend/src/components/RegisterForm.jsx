@@ -57,7 +57,7 @@ export default function RegisterForm() {
           pattern="[A-Za-z0-9_.\-]{3,50}"
           autoComplete="username"
         />
-        <Form.Text className="text-muted">3–50 символов: латиница, цифры и . _ -</Form.Text>
+        <Form.Text className="text-muted">3-50 символов: латиница, цифры и . _ -</Form.Text>
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="passwordField">

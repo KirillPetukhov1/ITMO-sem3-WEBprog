@@ -15,7 +15,7 @@ export default function useStudentsQuery() {
   const query = pickQuery(searchParams);
 
   function update(changes, { replace = false } = {}) {
-    // любое изменение условий — снова с первой страницы
+    // любое изменение условий - снова с первой страницы
     const next = { ...query, ...changes, page: changes.page ?? undefined };
     const href = studentsHref(next);
     if (pathname === '/students' && studentsHref(query) === href) {

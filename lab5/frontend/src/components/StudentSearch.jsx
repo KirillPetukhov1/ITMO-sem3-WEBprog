@@ -15,7 +15,7 @@ export default function StudentSearch() {
   const timer = useRef(null);
   const urlName = query.fullName ?? '';
 
-  // в url поменялось имя не из этого поля (кнопка «назад», «сбросить») —
+  // в url поменялось имя не из этого поля (кнопка "назад", "сбросить") -
   // подтягиваем значение в поле
   const [seenUrlName, setSeenUrlName] = useState(urlName);
   if (seenUrlName !== urlName) {

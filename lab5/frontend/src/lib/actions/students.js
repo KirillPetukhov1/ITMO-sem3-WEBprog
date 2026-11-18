@@ -9,7 +9,7 @@ import { ApiError, getErrorMessage } from '../errors.js';
 import { actAuthorized } from '../session.js';
 import { STUDENTS_TAG, isIsuId, studentTag } from '../students.js';
 
-// server action — это публичная точка входа, поэтому права проверяем здесь,
+// server action - это публичная точка входа, поэтому права проверяем здесь,
 // не надеясь на то, что кнопку видит только админ (java проверит ещё раз)
 function requireAdmin(user) {
   if (user?.role !== 'ADMIN') {

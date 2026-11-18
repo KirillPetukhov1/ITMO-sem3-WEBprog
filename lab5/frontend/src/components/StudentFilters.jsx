@@ -23,7 +23,7 @@ export default function StudentFilters() {
     update({ ...empty, fullName: '' });
   }
 
-  // key: при смене фильтров в url (в т.ч. «назад» в браузере) форма
+  // key: при смене фильтров в url (в т.ч. "назад" в браузере) форма
   // пересоздаётся и подхватывает значения из адреса
   const key = FILTER_FIELDS.map((name) => query[name] ?? '').join('|');
 

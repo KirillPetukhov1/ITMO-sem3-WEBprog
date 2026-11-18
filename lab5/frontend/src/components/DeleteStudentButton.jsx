@@ -23,7 +23,7 @@ export default function DeleteStudentButton({ isuId, fullName }) {
     }
     setError('');
     startTransition(async () => {
-      // успех — action сбросит кеш и уведёт на /students
+      // успех - action сбросит кеш и уведёт на /students
       const result = await deleteStudentAction(isuId);
       if (result?.error) {
         setError(result.error);
