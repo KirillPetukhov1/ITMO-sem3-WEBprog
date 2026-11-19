@@ -1,14 +1,15 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import DeleteStudentButton from '../../../components/DeleteStudentButton.jsx'
+import { loadStudent } from './loadStudent.js'
 
-import DeleteStudentButton from '../../../components/DeleteStudentButton.jsx';
-import { loadStudent } from './loadStudent.js';
-
-// динамический маршрут: [id] в имени папки - номер ИСУ из адреса /students/123456
 export async function generateMetadata({ params }) {
-  const { id } = await params;
-  const { student } = await loadStudent(id);
-  return { title: student ? student.fullName : 'Студент не найден' };
+  const { id } = await params
+  const { student } = await loadStudent(id)
+
+  return {
+    title: student ? student.fullName : 'Студент не найден',
+  }
 }
 
 function Field({ label, children }) {
@@ -17,16 +18,17 @@ function Field({ label, children }) {
       <span className="text-body-secondary">{label}</span>
       <span className="text-end">{children}</span>
     </li>
-  );
+  )
 }
 
 export default async function StudentPage({ params }) {
-  const { id } = await params;
-  const { student, user } = await loadStudent(id);
+  const { id } = await params
+  const { student, user } = await loadStudent(id)
   if (!student) {
-    notFound();
+    notFound()
   }
-  const isAdmin = user.role === 'ADMIN';
+
+  const isAdmin = user.role === 'ADMIN'
 
   return (
     <main>
@@ -55,7 +57,10 @@ export default async function StudentPage({ params }) {
 
         {isAdmin && (
           <div className="card-footer d-flex gap-2">
-            <Link href={`/students/${id}/edit`} className="btn btn-outline-primary">
+            <Link
+              href={`/students/${id}/edit`}
+              className="btn btn-outline-primary"
+            >
               Изменить
             </Link>
             <DeleteStudentButton isuId={id} fullName={student.fullName} />
@@ -63,5 +68,5 @@ export default async function StudentPage({ params }) {
         )}
       </div>
     </main>
-  );
+  )
 }

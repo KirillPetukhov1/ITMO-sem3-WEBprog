@@ -1,48 +1,47 @@
-'use client';
+'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
+import { useEffect, useRef, useState } from 'react'
+import { Button, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap'
+import { SORT_OPTIONS } from '../lib/query.js'
+import useStudentsQuery from './useStudentsQuery.js'
+const SEARCH_DELAY = 300
 
-import { SORT_OPTIONS } from '../lib/query.js';
-import useStudentsQuery from './useStudentsQuery.js';
-
-const SEARCH_DELAY = 300;
-
-// поиск по ФИО + сортировка. поиск срабатывает сам через 300 мс после ввода
 export default function StudentSearch() {
-  const { query, update, pending } = useStudentsQuery();
-  const [fullName, setFullName] = useState(query.fullName ?? '');
-  const timer = useRef(null);
-  const urlName = query.fullName ?? '';
-
-  // в url поменялось имя не из этого поля (кнопка "назад", "сбросить") -
-  // подтягиваем значение в поле
-  const [seenUrlName, setSeenUrlName] = useState(urlName);
+  const { query, update, pending } = useStudentsQuery()
+  const [fullName, setFullName] = useState(query.fullName ?? '')
+  const timer = useRef(null)
+  const urlName = query.fullName ?? ''
+  const [seenUrlName, setSeenUrlName] = useState(urlName)
   if (seenUrlName !== urlName) {
-    setSeenUrlName(urlName);
+    setSeenUrlName(urlName)
     if (fullName.trim() !== urlName) {
-      setFullName(urlName);
+      setFullName(urlName)
     }
   }
-
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => () => clearTimeout(timer.current), [])
 
   function search(value, replace) {
-    clearTimeout(timer.current);
-    update({ fullName: value.trim() }, { replace });
+    clearTimeout(timer.current)
+    update(
+      {
+        fullName: value.trim(),
+      },
+      {
+        replace,
+      },
+    )
   }
 
   function handleChange(event) {
-    const value = event.target.value;
-    setFullName(value);
-    clearTimeout(timer.current);
-    // replace, чтобы каждая буква не оставалась в истории браузера
-    timer.current = setTimeout(() => search(value, true), SEARCH_DELAY);
+    const value = event.target.value
+    setFullName(value)
+    clearTimeout(timer.current)
+    timer.current = setTimeout(() => search(value, true), SEARCH_DELAY)
   }
 
   function handleSubmit(event) {
-    event.preventDefault();
-    search(fullName, false);
+    event.preventDefault()
+    search(fullName, false)
   }
 
   return (
@@ -67,11 +66,17 @@ export default function StudentSearch() {
       <Row className="g-2 mb-3">
         <Col sm={6}>
           <Form.Group controlId="sortField">
-            <Form.Label className="small text-muted mb-1">Сортировать по</Form.Label>
+            <Form.Label className="small text-muted mb-1">
+              Сортировать по
+            </Form.Label>
             <Form.Select
               size="sm"
               value={query.sortBy ?? 'isuId'}
-              onChange={(event) => update({ sortBy: event.target.value })}
+              onChange={(event) =>
+                update({
+                  sortBy: event.target.value,
+                })
+              }
             >
               {SORT_OPTIONS.map(([value, label]) => (
                 <option key={value} value={value}>
@@ -87,7 +92,11 @@ export default function StudentSearch() {
             <Form.Select
               size="sm"
               value={query.order ?? 'asc'}
-              onChange={(event) => update({ order: event.target.value })}
+              onChange={(event) =>
+                update({
+                  order: event.target.value,
+                })
+              }
             >
               <option value="asc">по возрастанию</option>
               <option value="desc">по убыванию</option>
@@ -96,5 +105,5 @@ export default function StudentSearch() {
         </Col>
       </Row>
     </>
-  );
+  )
 }

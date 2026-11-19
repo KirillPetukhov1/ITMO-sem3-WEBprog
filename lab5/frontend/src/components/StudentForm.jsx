@@ -1,22 +1,21 @@
-'use client';
+'use client'
 
-import { useState, useTransition } from 'react';
-import { Alert, Button, Form, Spinner } from 'react-bootstrap';
+import { useState, useTransition } from 'react'
+import { Alert, Button, Form, Spinner } from 'react-bootstrap'
+import { studentDto } from '../lib/domain/student.js'
+import { getErrorMessage } from '../lib/errors.js'
 
-import { studentDto } from '../lib/domain/student.js';
-import { getErrorMessage } from '../lib/errors.js';
-
-// action - server action (создать или изменить), её передаёт серверная страница
 export default function StudentForm({ student = null, action, buttonText }) {
-  const [error, setError] = useState('');
-  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState('')
+  const [pending, startTransition] = useTransition()
 
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     if (pending) {
-      return;
+      return
     }
-    const data = new FormData(event.currentTarget);
+
+    const data = new FormData(event.currentTarget)
     const values = {
       fullName: data.get('fullName').trim(),
       group: data.get('group').trim(),
@@ -25,24 +24,24 @@ export default function StudentForm({ student = null, action, buttonText }) {
       settlementDate: data.get('settlementDate'),
       isForeigner: data.get('isForeigner') === 'true',
       notes: data.get('notes').trim(),
-    };
+    }
     if (student === null) {
-      values.isuId = Number(data.get('isuId'));
+      values.isuId = Number(data.get('isuId'))
     }
-    // та же проверка, что и на сервере - ошибку видно без запроса
     try {
-      studentDto(values, student !== null);
+      studentDto(values, student !== null)
     } catch (validationError) {
-      setError(getErrorMessage(validationError));
-      return;
+      setError(getErrorMessage(validationError))
+
+      return
     }
-    setError('');
+    setError('')
     startTransition(async () => {
-      const result = await action(values);
+      const result = await action(values)
       if (result?.error) {
-        setError(result.error);
+        setError(result.error)
       }
-    });
+    })
   }
 
   return (
@@ -122,7 +121,10 @@ export default function StudentForm({ student = null, action, buttonText }) {
 
       <Form.Group className="mb-3" controlId="foreignerField">
         <Form.Label>Иностранец</Form.Label>
-        <Form.Select name="isForeigner" defaultValue={String(student?.isForeigner ?? false)}>
+        <Form.Select
+          name="isForeigner"
+          defaultValue={String(student?.isForeigner ?? false)}
+        >
           <option value="false">нет</option>
           <option value="true">да</option>
         </Form.Select>
@@ -144,5 +146,5 @@ export default function StudentForm({ student = null, action, buttonText }) {
         {pending ? 'Сохраняем...' : buttonText}
       </Button>
     </Form>
-  );
+  )
 }

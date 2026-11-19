@@ -1,8 +1,8 @@
-import Link from 'next/link';
+import Link from 'next/link'
 
-import RegisterForm from '../../components/RegisterForm.jsx';
+import RegisterForm from '../../components/RegisterForm.jsx'
 
-export const metadata = { title: 'Регистрация' };
+export const metadata = { title: 'Регистрация' }
 
 export default function RegisterPage() {
   return (
@@ -11,7 +11,9 @@ export default function RegisterPage() {
         <div className="card">
           <div className="card-body">
             <h1 className="card-title h3">Регистрация</h1>
-            <p className="card-subtitle mb-4 text-body-secondary">создай аккаунт</p>
+            <p className="card-subtitle mb-4 text-body-secondary">
+              создай аккаунт
+            </p>
             <RegisterForm />
           </div>
         </div>
@@ -21,5 +23,5 @@ export default function RegisterPage() {
         </p>
       </div>
     </main>
-  );
+  )
 }

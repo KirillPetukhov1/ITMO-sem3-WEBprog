@@ -1,14 +1,15 @@
 export class ApiError extends Error {
   constructor(message, status = 0, code = 'NETWORK_ERROR', details = {}) {
-    super(message);
-    this.name = 'ApiError';
+    super(message)
+    this.name = 'ApiError'
     Object.assign(this, {
       status,
       code,
       details,
-    });
+    })
   }
 }
+
 const messages = {
   NO_SESSION: 'Войдите в систему.',
   UNAUTHORIZED: 'Сессия истекла. Войдите снова.',
@@ -26,31 +27,34 @@ const messages = {
   INTERNAL_ERROR: 'Внутренняя ошибка сервера.',
   INVALID_RESPONSE: 'Сервер вернул некорректный ответ.',
   INVALID_TOKEN: 'Некорректные данные пользователя в токене.',
-};
+}
 
 export function getErrorMessage(error) {
   if (error?.name === 'AbortError') {
-    return '';
+    return ''
   }
 
-  let details = error?.details;
+  let details = error?.details
   if (!details) {
-    details = {};
+    details = {}
   }
+
   const fields = Object.entries(details)
     .filter(([, value]) => Array.isArray(value))
     .map(([field, value]) => `${field}: ${value.join(' ')}`)
-    .join(' ');
+    .join(' ')
 
   if (fields) {
-    return fields;
+    return fields
   }
-  const message = messages[error?.code];
+
+  const message = messages[error?.code]
   if (message) {
-    return message;
+    return message
   }
   if (error?.message) {
-    return error.message;
+    return error.message
   }
-  return 'Не удалось выполнить операцию.';
+
+  return 'Не удалось выполнить операцию.'
 }

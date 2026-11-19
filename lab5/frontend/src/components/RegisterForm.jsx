@@ -1,49 +1,70 @@
-'use client';
+'use client'
 
-import { useState, useTransition } from 'react';
-import { Alert, Button, Form, Spinner } from 'react-bootstrap';
+import { useState, useTransition } from 'react'
+import { Alert, Button, Form, Spinner } from 'react-bootstrap'
 
-import { registerAction } from '../lib/actions/auth.js';
+import { registerAction } from '../lib/actions/auth.js'
 
 export default function RegisterForm() {
-  const [message, setMessage] = useState(null);
-  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState(null)
+  const [pending, startTransition] = useTransition()
 
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     if (pending) {
-      return;
+      return
     }
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const password = data.get('password');
+
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const password = data.get('password')
     if (new TextEncoder().encode(password).length > 72) {
-      setMessage({ error: true, text: 'пароль должен занимать не более 72 байт UTF-8.' });
-      return;
+      setMessage({
+        error: true,
+        text: 'пароль должен занимать не более 72 байт UTF-8.',
+      })
+
+      return
     }
-    setMessage(null);
+    setMessage(null)
     startTransition(async () => {
       const result = await registerAction({
         email: data.get('email').trim(),
         username: data.get('username').trim(),
         password,
-      });
+      })
       if (result?.ok) {
-        form.reset();
-        setMessage({ error: false, text: 'Аккаунт готов, прошу к нашему шалашу' });
+        form.reset()
+        setMessage({
+          error: false,
+          text: 'Аккаунт готов, прошу к нашему шалашу',
+        })
       } else {
-        setMessage({ error: true, text: result?.error ?? 'Не удалось выполнить операцию.' });
+        setMessage({
+          error: true,
+          text: result?.error ?? 'Не удалось выполнить операцию.',
+        })
       }
-    });
+    })
   }
 
   return (
     <Form onSubmit={handleSubmit}>
-      {message && <Alert variant={message.error ? 'danger' : 'success'}>{message.text}</Alert>}
+      {message && (
+        <Alert variant={message.error ? 'danger' : 'success'}>
+          {message.text}
+        </Alert>
+      )}
 
       <Form.Group className="mb-3" controlId="emailField">
         <Form.Label>Email</Form.Label>
-        <Form.Control name="email" type="email" required maxLength={254} autoComplete="email" />
+        <Form.Control
+          name="email"
+          type="email"
+          required
+          maxLength={254}
+          autoComplete="email"
+        />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="usernameField">
@@ -57,7 +78,9 @@ export default function RegisterForm() {
           pattern="[A-Za-z0-9_.\-]{3,50}"
           autoComplete="username"
         />
-        <Form.Text className="text-muted">3-50 символов: латиница, цифры и . _ -</Form.Text>
+        <Form.Text className="text-muted">
+          3-50 символов: латиница, цифры и . _ -
+        </Form.Text>
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="passwordField">
@@ -77,5 +100,5 @@ export default function RegisterForm() {
         {pending ? 'Регистрируем...' : 'Зарегистрироваться'}
       </Button>
     </Form>
-  );
+  )
 }

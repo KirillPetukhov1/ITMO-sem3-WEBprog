@@ -1,12 +1,18 @@
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-
-import { getErrorMessage } from '../lib/errors.js';
-import { studentsHref } from '../lib/query.js';
-import { readAuthorized } from '../lib/session.js';
-import { listStudents } from '../lib/students.js';
-
-const COLUMNS = ['ИСУ', 'ФИО', 'Группа', 'Общага', 'Комната', 'Заселён', 'Иностранец'];
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { getErrorMessage } from '../lib/errors.js'
+import { studentsHref } from '../lib/query.js'
+import { readAuthorized } from '../lib/session.js'
+import { listStudents } from '../lib/students.js'
+const COLUMNS = [
+  'ИСУ',
+  'ФИО',
+  'Группа',
+  'Общага',
+  'Комната',
+  'Заселён',
+  'Иностранец',
+]
 
 function TableShell({ children }) {
   return (
@@ -22,7 +28,7 @@ function TableShell({ children }) {
         <tbody>{children}</tbody>
       </table>
     </div>
-  );
+  )
 }
 
 export function StudentsTableSkeleton() {
@@ -32,21 +38,26 @@ export function StudentsTableSkeleton() {
         <span className="placeholder col-2" />
       </p>
       <TableShell>
-        {Array.from({ length: 5 }, (_, row) => (
-          <tr key={row} className="placeholder-glow">
-            {COLUMNS.map((title) => (
-              <td key={title}>
-                <span className="placeholder col-8" />
-              </td>
-            ))}
-          </tr>
-        ))}
+        {Array.from(
+          {
+            length: 5,
+          },
+          (_, row) => (
+            <tr key={row} className="placeholder-glow">
+              {COLUMNS.map((title) => (
+                <td key={title}>
+                  <span className="placeholder col-8" />
+                </td>
+              ))}
+            </tr>
+          ),
+        )}
       </TableShell>
       <p className="visually-hidden" role="status">
         загружаем студентов...
       </p>
     </div>
-  );
+  )
 }
 
 function PageLink({ query, page, disabled, children, label }) {
@@ -57,38 +68,49 @@ function PageLink({ query, page, disabled, children, label }) {
           {children}
         </span>
       </li>
-    );
+    )
   }
-  // Link заранее подгружает соседнюю страницу (prefetch), переход мгновенный
+
   return (
     <li className="page-item">
-      <Link className="page-link" href={studentsHref({ ...query, page })} aria-label={label}>
+      <Link
+        className="page-link"
+        href={studentsHref({
+          ...query,
+          page,
+        })}
+        aria-label={label}
+      >
         {children}
       </Link>
     </li>
-  );
+  )
 }
 
-// серверный компонент: данные запрашиваются на сервере (и берутся из кеша next)
 export default async function StudentsTable({ query }) {
-  let data;
+  let data
   try {
-    data = await readAuthorized((token) => listStudents(query, token));
+    data = await readAuthorized((token) => listStudents(query, token))
   } catch (error) {
-    // после удаления страница могла исчезнуть - уходим на последнюю существующую
-    if (error?.code === 'PAGE_NOT_FOUND' && Number.isInteger(error.details?.total_pages)) {
-      redirect(studentsHref({ ...query, page: error.details.total_pages }));
+    if (
+      error?.code === 'PAGE_NOT_FOUND' &&
+      Number.isInteger(error.details?.total_pages)
+    ) {
+      redirect(
+        studentsHref({
+          ...query,
+          page: error.details.total_pages,
+        }),
+      )
     }
-    // кривые параметры в адресе - показываем ошибку прямо над таблицей
     if (error?.status === 422 || error?.status === 400) {
-      return <div className="alert alert-warning">{getErrorMessage(error)}</div>;
+      return <div className="alert alert-warning">{getErrorMessage(error)}</div>
     }
-    // остальное (java упала и т.п.) ловит error.jsx
-    throw error;
+    throw error
   }
 
-  const page = data.page;
-  const totalPages = Math.max(1, data.total_pages);
+  const page = data.page
+  const totalPages = Math.max(1, data.total_pages)
 
   return (
     <>
@@ -96,7 +118,10 @@ export default async function StudentsTable({ query }) {
       <TableShell>
         {data.results.length === 0 && (
           <tr>
-            <td colSpan={COLUMNS.length} className="text-center text-body-secondary">
+            <td
+              colSpan={COLUMNS.length}
+              className="text-center text-body-secondary"
+            >
               Никого не нашлось
             </td>
           </tr>
@@ -105,7 +130,9 @@ export default async function StudentsTable({ query }) {
           <tr key={student.isuId}>
             <td>{student.isuId}</td>
             <td>
-              <Link href={`/students/${student.isuId}`}>{student.fullName}</Link>
+              <Link href={`/students/${student.isuId}`}>
+                {student.fullName}
+              </Link>
             </td>
             <td>{student.group}</td>
             <td>{student.dormitory}</td>
@@ -118,7 +145,12 @@ export default async function StudentsTable({ query }) {
 
       <nav aria-label="Страницы">
         <ul className="pagination justify-content-center">
-          <PageLink query={query} page={page - 1} disabled={page <= 1} label="Назад">
+          <PageLink
+            query={query}
+            page={page - 1}
+            disabled={page <= 1}
+            label="Назад"
+          >
             {'<'}
           </PageLink>
           <li className="page-item active" aria-current="page">
@@ -126,11 +158,16 @@ export default async function StudentsTable({ query }) {
               {page} из {totalPages}
             </span>
           </li>
-          <PageLink query={query} page={page + 1} disabled={page >= totalPages} label="Вперёд">
+          <PageLink
+            query={query}
+            page={page + 1}
+            disabled={page >= totalPages}
+            label="Вперёд"
+          >
             {'>'}
           </PageLink>
         </ul>
       </nav>
     </>
-  );
+  )
 }

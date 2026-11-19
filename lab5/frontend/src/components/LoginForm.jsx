@@ -1,32 +1,31 @@
-'use client';
+'use client'
 
-import { useState, useTransition } from 'react';
-import { Alert, Button, Form, Spinner } from 'react-bootstrap';
-
-import { loginAction } from '../lib/actions/auth.js';
+import { useState, useTransition } from 'react'
+import { Alert, Button, Form, Spinner } from 'react-bootstrap'
+import { loginAction } from '../lib/actions/auth.js'
 
 export default function LoginForm({ next }) {
-  const [error, setError] = useState('');
-  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState('')
+  const [pending, startTransition] = useTransition()
 
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
     if (pending) {
-      return;
+      return
     }
-    const data = new FormData(event.currentTarget);
-    setError('');
+
+    const data = new FormData(event.currentTarget)
+    setError('')
     startTransition(async () => {
-      // при успехе action сам сделает redirect, сюда вернётся только ошибка
       const result = await loginAction({
         username: data.get('username'),
         password: data.get('password'),
         next,
-      });
+      })
       if (result?.error) {
-        setError(result.error);
+        setError(result.error)
       }
-    });
+    })
   }
 
   return (
@@ -34,7 +33,13 @@ export default function LoginForm({ next }) {
       {error && <Alert variant="danger">{error}</Alert>}
       <Form.Group className="mb-3" controlId="usernameField">
         <Form.Label>Логин</Form.Label>
-        <Form.Control name="username" type="text" required maxLength={50} autoComplete="username" />
+        <Form.Control
+          name="username"
+          type="text"
+          required
+          maxLength={50}
+          autoComplete="username"
+        />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="passwordField">
@@ -53,5 +58,5 @@ export default function LoginForm({ next }) {
         {pending ? 'Заходим...' : 'Войти'}
       </Button>
     </Form>
-  );
+  )
 }

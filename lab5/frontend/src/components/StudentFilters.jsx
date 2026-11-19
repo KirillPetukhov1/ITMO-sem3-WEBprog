@@ -1,31 +1,31 @@
-'use client';
+'use client'
 
-import { Button, Card, Form, Stack } from 'react-bootstrap';
-
-import { FILTER_FIELDS } from '../lib/query.js';
-import useStudentsQuery from './useStudentsQuery.js';
+import { Button, Card, Form, Stack } from 'react-bootstrap'
+import { FILTER_FIELDS } from '../lib/query.js'
+import useStudentsQuery from './useStudentsQuery.js'
 
 export default function StudentFilters() {
-  const { query, update } = useStudentsQuery();
+  const { query, update } = useStudentsQuery()
 
   function handleSubmit(event) {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const filters = {};
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    const filters = {}
     for (const name of FILTER_FIELDS) {
-      filters[name] = String(data.get(name) ?? '').trim();
+      filters[name] = String(data.get(name) ?? '').trim()
     }
-    update(filters);
+    update(filters)
   }
 
   function handleReset() {
-    const empty = Object.fromEntries(FILTER_FIELDS.map((name) => [name, '']));
-    update({ ...empty, fullName: '' });
+    const empty = Object.fromEntries(FILTER_FIELDS.map((name) => [name, '']))
+    update({
+      ...empty,
+      fullName: '',
+    })
   }
 
-  // key: при смене фильтров в url (в т.ч. "назад" в браузере) форма
-  // пересоздаётся и подхватывает значения из адреса
-  const key = FILTER_FIELDS.map((name) => query[name] ?? '').join('|');
+  const key = FILTER_FIELDS.map((name) => query[name] ?? '').join('|')
 
   return (
     <Card>
@@ -96,7 +96,11 @@ export default function StudentFilters() {
 
           <Form.Group className="mb-2" controlId="foreignerFilter">
             <Form.Label className="small mb-1">Иностранец</Form.Label>
-            <Form.Select size="sm" name="isForeigner" defaultValue={query.isForeigner ?? ''}>
+            <Form.Select
+              size="sm"
+              name="isForeigner"
+              defaultValue={query.isForeigner ?? ''}
+            >
               <option value="">любой</option>
               <option value="true">да</option>
               <option value="false">нет</option>
@@ -118,12 +122,17 @@ export default function StudentFilters() {
             <Button type="submit" size="sm">
               Применить
             </Button>
-            <Button type="button" size="sm" variant="outline-secondary" onClick={handleReset}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline-secondary"
+              onClick={handleReset}
+            >
               Сбросить
             </Button>
           </Stack>
         </Form>
       </Card.Body>
     </Card>
-  );
+  )
 }

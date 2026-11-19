@@ -1,5 +1,3 @@
-// параметры списка студентов живут в адресной строке: /students?group=A1234&page=2
-// модуль общий для сервера и клиента
 export const FILTER_FIELDS = [
   'group',
   'isuId',
@@ -8,8 +6,15 @@ export const FILTER_FIELDS = [
   'settlementDate',
   'isForeigner',
   'notes',
-];
-export const QUERY_FIELDS = ['fullName', ...FILTER_FIELDS, 'sortBy', 'order', 'page'];
+]
+
+export const QUERY_FIELDS = [
+  'fullName',
+  ...FILTER_FIELDS,
+  'sortBy',
+  'order',
+  'page',
+]
 
 export const SORT_OPTIONS = [
   ['isuId', 'номер ИСУ'],
@@ -20,43 +25,44 @@ export const SORT_OPTIONS = [
   ['settlementDate', 'дата заселения'],
   ['isForeigner', 'иностранец'],
   ['notes', 'примечания'],
-];
+]
 
-// searchParams -> плоский объект только с известными полями
 export function pickQuery(searchParams) {
   const get =
     typeof searchParams?.get === 'function'
       ? (key) => searchParams.get(key)
-      : (key) => searchParams?.[key];
-  const query = {};
+      : (key) => searchParams?.[key]
+  const query = {}
   for (const field of QUERY_FIELDS) {
-    let value = get(field);
+    let value = get(field)
     if (Array.isArray(value)) {
-      value = value[0];
+      value = value[0]
     }
     if (typeof value === 'string' && value.trim() !== '') {
-      query[field] = value.trim();
+      query[field] = value.trim()
     }
   }
-  return query;
+
+  return query
 }
 
 export function queryString(query) {
-  const params = new URLSearchParams();
+  const params = new URLSearchParams()
   for (const field of QUERY_FIELDS) {
-    const value = query[field];
+    const value = query[field]
     if (value !== undefined && value !== null && String(value) !== '') {
-      params.set(field, String(value));
+      params.set(field, String(value))
     }
   }
-  // значения по умолчанию в адрес не пишем
-  if (params.get('page') === '1') params.delete('page');
-  if (params.get('sortBy') === 'isuId') params.delete('sortBy');
-  if (params.get('order') === 'asc') params.delete('order');
-  return params.toString();
+  if (params.get('page') === '1') params.delete('page')
+  if (params.get('sortBy') === 'isuId') params.delete('sortBy')
+  if (params.get('order') === 'asc') params.delete('order')
+
+  return params.toString()
 }
 
 export function studentsHref(query) {
-  const qs = queryString(query);
-  return qs ? `/students?${qs}` : '/students';
+  const qs = queryString(query)
+
+  return qs ? `/students?${qs}` : '/students'
 }

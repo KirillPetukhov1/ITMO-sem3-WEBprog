@@ -1,11 +1,12 @@
-import Link from 'next/link';
+import Link from 'next/link'
+import LogoutButton from '../../components/LogoutButton.jsx'
+import RoleBadge from '../../components/RoleBadge.jsx'
+import { backendFetch } from '../../lib/backend.js'
+import { readAuthorized } from '../../lib/session.js'
 
-import LogoutButton from '../../components/LogoutButton.jsx';
-import RoleBadge from '../../components/RoleBadge.jsx';
-import { backendFetch } from '../../lib/backend.js';
-import { readAuthorized } from '../../lib/session.js';
-
-export const metadata = { title: 'Профиль' };
+export const metadata = {
+  title: 'Профиль',
+}
 
 function Row({ label, children }) {
   return (
@@ -13,12 +14,16 @@ function Row({ label, children }) {
       <span className="text-body-secondary">{label}</span>
       <span className="text-break text-end">{children}</span>
     </li>
-  );
+  )
 }
 
-// ssr: профиль берём у java на сервере, в браузер приходит готовый html
 export default async function ProfilePage() {
-  const user = await readAuthorized((token) => backendFetch('/api/auth/session/me', { token }));
+  const user = await readAuthorized((token) =>
+    backendFetch('/api/auth/session/me', {
+      token,
+    }),
+  )
+
   return (
     <main className="row justify-content-center">
       <div className="col-md-8 col-lg-6">
@@ -45,5 +50,5 @@ export default async function ProfilePage() {
         </div>
       </div>
     </main>
-  );
+  )
 }
