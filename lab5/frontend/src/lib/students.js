@@ -1,4 +1,5 @@
 import 'server-only'
+import { createHash } from 'node:crypto'
 import { backendFetch } from './backend.js'
 import { STUDENTS_REVALIDATE } from './config.js'
 import { pageFromDto, searchDto, studentFromDto } from './domain/student.js'
@@ -23,12 +24,18 @@ function cached(tags) {
   }
 }
 
-export async function listStudents(params, token) {
+export function studentsVersion({ count, page, total_pages, results }) {
+  return createHash('sha256')
+    .update(JSON.stringify([count, page, total_pages, results]))
+    .digest('hex')
+}
+
+export async function listStudents(params, token, { fresh = false } = {}) {
   const query = searchDto(params)
   const dto = await backendFetch('/api/students', {
     query,
     token,
-    ...cached([STUDENTS_TAG]),
+    ...(fresh ? { cache: 'no-store' } : cached([STUDENTS_TAG])),
   })
 
   return pageFromDto(dto)

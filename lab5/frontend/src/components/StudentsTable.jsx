@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getErrorMessage } from '../lib/errors.js'
-import { studentsHref } from '../lib/query.js'
+import StudentsFreshnessNotice from './StudentsFreshnessNotice.jsx'
+import { queryString, studentsHref } from '../lib/query.js'
 import { readAuthorized } from '../lib/session.js'
-import { listStudents } from '../lib/students.js'
+import { listStudents, studentsVersion } from '../lib/students.js'
 const COLUMNS = [
   'ИСУ',
   'ФИО',
@@ -109,11 +110,18 @@ export default async function StudentsTable({ query }) {
     throw error
   }
 
+  const version = studentsVersion(data)
+  const search = queryString(query)
   const page = data.page
   const totalPages = Math.max(1, data.total_pages)
 
   return (
     <>
+      <StudentsFreshnessNotice
+        key={search + version}
+        search={search}
+        version={version}
+      />
       <p className="text-body-secondary small mb-2">Найдено: {data.count}</p>
       <TableShell>
         {data.results.length === 0 && (
