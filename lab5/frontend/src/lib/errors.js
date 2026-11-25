@@ -52,6 +52,7 @@ export function getErrorMessage(error) {
   if (message) {
     return message
   }
+
   if (error?.message) {
     return error.message
   }

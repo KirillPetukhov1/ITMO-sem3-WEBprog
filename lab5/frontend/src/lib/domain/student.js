@@ -43,9 +43,11 @@ function validateText(field, value, filter) {
     min = 5
     max = 100
   }
+
   if (filter) {
     min = 1
   }
+
   if (typeof value !== 'string' || value.length < min || value.length > max) {
     invalid(field, `Длина от ${min} до ${max} символов`)
   }
@@ -98,6 +100,7 @@ export function studentDto(values, patch = false) {
     if (patch && field === 'isuId') {
       continue
     }
+
     if (!Object.hasOwn(values, field)) {
       if (patch || field === 'notes') {
         continue
@@ -126,6 +129,7 @@ function validateSearchField(field, value) {
 
     return
   }
+
   if (field === 'order') {
     if (!['asc', 'desc'].includes(value)) {
       invalid(field, 'Ожидается asc или desc')
@@ -149,15 +153,19 @@ export function searchDto(values = {}) {
     if (value === undefined || value === '') {
       continue
     }
+
     if (typeof value === 'string') {
       value = value.trim()
     }
+
     if (value === '') {
       continue
     }
+
     if (ranges[field] && typeof value === 'string' && /^\d+$/.test(value)) {
       value = Number(value)
     }
+
     if (field === 'isForeigner' && ['true', 'false'].includes(value)) {
       value = value === 'true'
     }
@@ -172,6 +180,7 @@ export function studentFromDto(dto) {
   if (!dto || typeof dto !== 'object') {
     throw new ApiError('Некорректный студент', 0, 'INVALID_RESPONSE')
   }
+
   try {
     for (const field of studentFields) {
       validate(field, dto[field])

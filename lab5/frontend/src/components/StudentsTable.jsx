@@ -104,6 +104,7 @@ export default async function StudentsTable({ query }) {
         }),
       )
     }
+
     if (error?.status === 422 || error?.status === 400) {
       return <div className="alert alert-warning">{getErrorMessage(error)}</div>
     }

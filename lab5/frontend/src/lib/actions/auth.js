@@ -40,6 +40,7 @@ export async function loginAction(values) {
       error: 'Неверный логин или пароль.',
     }
   }
+
   try {
     const pair = await backendFetch('/api/auth/login', {
       method: 'POST',
@@ -67,16 +68,20 @@ export async function registerAction(values) {
   if (!USERNAME.test(username)) {
     details.username = ['3-50 символов: латиница, цифры и . _ -']
   }
+
   if (email.length > 254 || !EMAIL.test(email)) {
     details.email = ['Некорректный email.']
   }
+
   if (password.length < 8 || passwordTooLong(password)) {
     details.password = ['От 8 символов и не более 72 байт UTF-8.']
   }
+
   try {
     if (Object.keys(details).length > 0) {
       throw new ApiError('Проверьте данные.', 422, 'VALIDATION_ERROR', details)
     }
+
     await backendFetch('/api/auth/register', {
       method: 'POST',
       body: {
@@ -108,6 +113,7 @@ export async function logoutAction() {
       })
     } catch {}
   }
+
   await clearTokens()
   redirect('/login')
 }

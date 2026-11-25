@@ -24,7 +24,8 @@ export default [
         { blankLine: 'always', prev: arrowFunction, next: '*' },
         { blankLine: 'always', prev: '*', next: 'export' },
         { blankLine: 'always', prev: '*', next: 'return' },
-        { blankLine: 'always', prev: 'block-like', next: ['const', 'let', 'var'] },
+        { blankLine: 'always', prev: 'block-like', next: ['const', 'let', 'var', 'try', 'if'] },
+        { blankLine: 'always', prev: 'block-like', next: { selector: 'ExpressionStatement[expression.type="AwaitExpression"]' } },
         {
             blankLine: 'always',
             prev: { selector: 'ExportNamedDeclaration:has(> ClassDeclaration)' },

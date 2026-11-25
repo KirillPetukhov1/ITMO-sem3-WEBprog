@@ -38,6 +38,7 @@ export function userFromAccess(token) {
   if (!token) {
     return null
   }
+
   try {
     return userFromToken(token)
   } catch {
@@ -67,6 +68,7 @@ export async function refreshTokens(refreshToken) {
   if (!refreshToken) {
     return null
   }
+
   try {
     const response = await fetch(`${API_URL}/api/auth/refresh`, {
       method: 'POST',

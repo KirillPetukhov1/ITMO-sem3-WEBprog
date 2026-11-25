@@ -15,6 +15,7 @@ export default async function EditStudentPage({ params }) {
   if (user.role !== 'ADMIN') {
     return <Forbidden />
   }
+
   if (!student) {
     notFound()
   }

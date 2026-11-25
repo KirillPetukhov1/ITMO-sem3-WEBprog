@@ -22,9 +22,11 @@ function responseError(response, data) {
   if (data?.error?.code) {
     code = data.error.code
   }
+
   if (data?.error?.message) {
     message = data.error.message
   }
+
   if (data?.error?.details) {
     details = data.error.details
   }
@@ -48,6 +50,7 @@ async function readResponse(response) {
       }
     }
   }
+
   if (!response.ok) {
     throw responseError(response, data)
   }
@@ -75,6 +78,7 @@ export async function backendFetch(
   if (next) {
     options.next = next
   }
+
   if (body !== undefined) {
     headers['Content-Type'] = 'application/json'
     options.body = JSON.stringify(body)

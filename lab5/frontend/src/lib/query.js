@@ -38,6 +38,7 @@ export function pickQuery(searchParams) {
     if (Array.isArray(value)) {
       value = value[0]
     }
+
     if (typeof value === 'string' && value.trim() !== '') {
       query[field] = value.trim()
     }
@@ -54,6 +55,7 @@ export function queryString(query) {
       params.set(field, String(value))
     }
   }
+
   if (params.get('page') === '1') params.delete('page')
   if (params.get('sortBy') === 'isuId') params.delete('sortBy')
   if (params.get('order') === 'asc') params.delete('order')

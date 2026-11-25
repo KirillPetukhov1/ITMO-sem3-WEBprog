@@ -83,6 +83,7 @@ export async function actAuthorized(action) {
     await clearTokens()
     redirect('/login?expired=1')
   }
+
   await saveTokens(pair)
 
   return action(pair.accessToken, userFromAccess(pair.accessToken))

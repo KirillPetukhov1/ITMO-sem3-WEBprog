@@ -28,6 +28,7 @@ export default function StudentForm({ student = null, action, buttonText }) {
     if (student === null) {
       values.isuId = Number(data.get('isuId'))
     }
+
     try {
       studentDto(values, student !== null)
     } catch (validationError) {
