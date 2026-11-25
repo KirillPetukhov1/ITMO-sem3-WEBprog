@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useTransition } from 'react'
+import { watchStudentsVersion } from '../lib/client/watchStudentsVersion.js'
 import { useRouter } from 'next/navigation'
 
 export default function StudentsFreshnessNotice({ search, version }) {
@@ -9,36 +10,9 @@ export default function StudentsFreshnessNotice({ search, version }) {
   const [pending, startTransition] = useTransition()
 
   useEffect(() => {
-    const controller = new AbortController()
-    let timer
-
-    async function checkVersion() {
-      try {
-        const response = await fetch('/students/version?' + search, {
-          cache: 'no-store',
-          redirect: 'error',
-          signal: controller.signal,
-        })
-        if (response.ok) {
-          const current = await response.json()
-          if (!controller.signal.aborted) {
-            setStale(current.version !== version)
-          }
-        }
-      } catch {
-      } finally {
-        if (!controller.signal.aborted) {
-          timer = setTimeout(checkVersion, 5000)
-        }
-      }
-    }
-
-    checkVersion()
-
-    return () => {
-      controller.abort()
-      clearTimeout(timer)
-    }
+    return watchStudentsVersion(search, (currentVersion) => {
+      setStale(currentVersion !== version)
+    })
   }, [search, version])
 
   if (!stale) {
